@@ -3,1551 +3,642 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Small Model Marketplace — On-Device AI Infrastructure</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=Lora:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<title>SMALL MODEL MARKETPLACE</title>
 <style>
-  :root {
-    --moss: #2d4a22;
-    --canopy: #3d6b2e;
-    --leaf: #5a9140;
-    --sprout: #8cbf5e;
-    --lichen: #c5dfa8;
-    --petal: #f0f7e6;
-    --amber: #c97c2a;
-    --gold: #e8a93c;
-    --honey: #f5cc7a;
-    --cream: #faf6ee;
-    --bark: #7a5533;
-    --earth: #a67c52;
-    --terracotta: #c26b42;
-    --night: #0f1f0a;
-    --dusk: #1a3012;
-  }
+  @import url('https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Bebas+Neue&display=swap');
 
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-  html { scroll-behavior: smooth; }
+  :root {
+    --black: #0a0a0a;
+    --white: #f0ede8;
+    --concrete: #c8c3bc;
+    --mid: #888;
+    --red: #c0392b;
+  }
+
+  html { font-size: 16px; }
 
   body {
-    background-color: var(--cream);
-    color: var(--moss);
-    font-family: 'Lora', Georgia, serif;
+    background: var(--white);
+    color: var(--black);
+    font-family: 'Space Mono', monospace;
+    font-size: 0.85rem;
+    line-height: 1.6;
     overflow-x: hidden;
-    cursor: none;
   }
 
-  /* CUSTOM CURSOR */
-  .cursor {
-    position: fixed;
-    width: 12px; height: 12px;
-    background: var(--leaf);
-    border-radius: 50%;
-    pointer-events: none;
-    z-index: 9999;
-    transition: transform 0.15s ease, background 0.2s;
-    transform: translate(-50%, -50%);
-  }
-  .cursor-ring {
-    position: fixed;
-    width: 36px; height: 36px;
-    border: 1.5px solid var(--leaf);
-    border-radius: 50%;
-    pointer-events: none;
-    z-index: 9998;
-    transition: transform 0.35s cubic-bezier(.23,1,.32,1), opacity 0.2s;
-    transform: translate(-50%, -50%);
-    opacity: 0.6;
+  /* HEADER */
+  header {
+    background: var(--black);
+    color: var(--white);
+    padding: 0;
+    border-bottom: 6px solid var(--red);
   }
 
-  /* NOISE OVERLAY */
-  body::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
-    pointer-events: none;
-    z-index: 1000;
-    opacity: 0.35;
-  }
-
-  /* NAV */
-  nav {
-    position: fixed;
-    top: 0; left: 0; right: 0;
-    z-index: 100;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 1.25rem 3rem;
-    background: rgba(250,246,238,0.88);
-    backdrop-filter: blur(12px);
-    border-bottom: 1px solid rgba(90,145,64,0.15);
-  }
-
-  .nav-logo {
-    font-family: 'Playfair Display', serif;
-    font-size: 1.1rem;
-    font-weight: 700;
-    color: var(--moss);
-    letter-spacing: 0.02em;
-    display: flex; align-items: center; gap: 0.6rem;
-  }
-  .nav-logo .leaf-icon {
-    width: 22px; height: 22px;
-    background: var(--leaf);
-    clip-path: polygon(50% 0%, 85% 15%, 100% 50%, 85% 85%, 50% 100%, 15% 85%, 0% 50%, 15% 15%);
-    display: inline-block;
-    position: relative;
-    animation: spin-slow 12s linear infinite;
-  }
-  @keyframes spin-slow { to { transform: rotate(360deg); } }
-
-  nav ul { list-style: none; display: flex; gap: 2.5rem; }
-  nav ul a {
-    font-family: 'DM Mono', monospace;
-    font-size: 0.72rem;
-    color: var(--canopy);
-    text-decoration: none;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    transition: color 0.2s;
-  }
-  nav ul a:hover { color: var(--amber); }
-
-  .nav-cta {
-    font-family: 'DM Mono', monospace;
-    font-size: 0.72rem;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    background: var(--moss);
-    color: var(--petal);
-    border: none;
-    padding: 0.6rem 1.4rem;
-    border-radius: 2px;
-    cursor: none;
-    transition: background 0.2s, transform 0.15s;
-  }
-  .nav-cta:hover { background: var(--canopy); transform: translateY(-1px); }
-
-  /* HERO */
-  .hero {
-    min-height: 100vh;
+  .header-inner {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    position: relative;
-    overflow: hidden;
+    grid-template-columns: 1fr auto;
+    align-items: end;
+    padding: 3rem 3rem 1.5rem;
+    gap: 2rem;
   }
 
-  .hero-left {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    padding: 8rem 4rem 6rem 6rem;
-    position: relative;
-    z-index: 2;
+  .site-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(3rem, 10vw, 8rem);
+    line-height: 0.9;
+    letter-spacing: 0.02em;
+    color: var(--white);
   }
 
-  .hero-eyebrow {
-    font-family: 'DM Mono', monospace;
+  .site-title span { color: var(--red); }
+
+  .header-meta {
+    text-align: right;
     font-size: 0.7rem;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    color: var(--leaf);
-    margin-bottom: 1.5rem;
-    display: flex; align-items: center; gap: 0.75rem;
-  }
-  .hero-eyebrow::before {
-    content: '';
-    display: inline-block;
-    width: 32px; height: 1px;
-    background: var(--leaf);
-  }
-
-  .hero-title {
-    font-family: 'Playfair Display', serif;
-    font-size: clamp(3.2rem, 5vw, 5.5rem);
-    font-weight: 900;
-    line-height: 1.0;
-    color: var(--night);
-    margin-bottom: 2rem;
-    letter-spacing: -0.02em;
-  }
-  .hero-title em {
-    font-style: italic;
-    color: var(--canopy);
-  }
-  .hero-title .accent-word {
-    position: relative;
-    display: inline-block;
-  }
-  .hero-title .accent-word::after {
-    content: '';
-    position: absolute;
-    bottom: 4px; left: 0; right: 0;
-    height: 6px;
-    background: var(--honey);
-    z-index: -1;
-    opacity: 0.7;
-  }
-
-  .hero-sub {
-    font-family: 'Lora', serif;
-    font-size: 1.05rem;
-    line-height: 1.7;
-    color: var(--bark);
-    max-width: 440px;
-    margin-bottom: 3rem;
-    font-style: italic;
-  }
-
-  .hero-actions { display: flex; gap: 1rem; align-items: center; }
-
-  .btn-primary {
-    font-family: 'DM Mono', monospace;
-    font-size: 0.75rem;
+    color: var(--concrete);
     letter-spacing: 0.1em;
     text-transform: uppercase;
-    background: var(--leaf);
-    color: white;
-    border: none;
-    padding: 0.9rem 2rem;
-    border-radius: 2px;
-    cursor: none;
-    transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
-  }
-  .btn-primary:hover {
-    background: var(--canopy);
-    transform: translateY(-2px);
-    box-shadow: 0 8px 24px rgba(45,74,34,0.25);
+    padding-bottom: 0.5rem;
   }
 
-  .btn-ghost {
-    font-family: 'DM Mono', monospace;
+  .tagline {
+    background: var(--red);
+    color: var(--white);
+    padding: 0.75rem 3rem;
     font-size: 0.75rem;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    background: transparent;
-    color: var(--moss);
-    border: 1px solid var(--lichen);
-    padding: 0.9rem 2rem;
-    border-radius: 2px;
-    cursor: none;
-    transition: border-color 0.2s, color 0.2s;
-  }
-  .btn-ghost:hover { border-color: var(--leaf); color: var(--leaf); }
-
-  .hero-right {
-    position: relative;
-    overflow: hidden;
-    background: var(--dusk);
-  }
-
-  /* SVG BOTANICAL ILLUSTRATION */
-  .hero-botanical {
-    position: absolute;
-    inset: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .botanical-svg {
-    width: 90%;
-    height: 90%;
-    opacity: 0.85;
-  }
-
-  .floating-stat {
-    position: absolute;
-    background: rgba(250,246,238,0.1);
-    backdrop-filter: blur(8px);
-    border: 1px solid rgba(140,191,94,0.3);
-    border-radius: 4px;
-    padding: 1rem 1.5rem;
-    color: var(--lichen);
-    font-family: 'DM Mono', monospace;
-  }
-  .floating-stat .stat-num {
-    font-size: 1.8rem;
-    font-weight: 500;
-    color: var(--honey);
-    display: block;
-  }
-  .floating-stat .stat-label {
-    font-size: 0.65rem;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--sprout);
-  }
-  .floating-stat:nth-child(1) { top: 20%; left: 10%; animation: float 6s ease-in-out infinite; }
-  .floating-stat:nth-child(2) { bottom: 28%; right: 8%; animation: float 7s ease-in-out infinite 1s; }
-  .floating-stat:nth-child(3) { top: 55%; left: 15%; animation: float 5.5s ease-in-out infinite 2s; }
-
-  @keyframes float {
-    0%, 100% { transform: translateY(0px); }
-    50% { transform: translateY(-10px); }
-  }
-
-  /* SCROLL INDICATOR */
-  .scroll-hint {
-    position: absolute;
-    bottom: 2.5rem;
-    left: 50%;
-    transform: translateX(-50%);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.5rem;
-    font-family: 'DM Mono', monospace;
-    font-size: 0.6rem;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    color: var(--leaf);
-    z-index: 5;
-  }
-  .scroll-hint .arrow {
-    width: 1px;
-    height: 40px;
-    background: linear-gradient(to bottom, var(--leaf), transparent);
-    animation: scroll-line 1.8s ease-in-out infinite;
-  }
-  @keyframes scroll-line {
-    0% { transform: scaleY(0); transform-origin: top; opacity: 0; }
-    50% { transform: scaleY(1); transform-origin: top; opacity: 1; }
-    100% { transform: scaleY(1); transform-origin: bottom; opacity: 0; }
-  }
-
-  /* TAGLINE BAND */
-  .tagline-band {
-    background: var(--moss);
-    color: var(--lichen);
-    padding: 1.25rem 0;
-    overflow: hidden;
-    position: relative;
-  }
-  .tagline-track {
-    display: flex;
-    white-space: nowrap;
-    animation: marquee 30s linear infinite;
-    font-family: 'DM Mono', monospace;
-    font-size: 0.72rem;
     letter-spacing: 0.15em;
     text-transform: uppercase;
-    gap: 4rem;
-  }
-  .tagline-track span { color: var(--gold); }
-  @keyframes marquee {
-    from { transform: translateX(0); }
-    to { transform: translateX(-50%); }
-  }
-
-  /* SECTIONS */
-  section { padding: 7rem 6rem; }
-
-  .section-label {
-    font-family: 'DM Mono', monospace;
-    font-size: 0.68rem;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    color: var(--leaf);
-    margin-bottom: 1rem;
-    display: flex; align-items: center; gap: 0.75rem;
-  }
-  .section-label::before {
-    content: '';
-    width: 24px; height: 1px;
-    background: var(--leaf);
-    display: inline-block;
-  }
-
-  .section-title {
-    font-family: 'Playfair Display', serif;
-    font-size: clamp(2.2rem, 3.5vw, 3.5rem);
-    font-weight: 900;
-    line-height: 1.1;
-    color: var(--night);
-    margin-bottom: 1.5rem;
-    letter-spacing: -0.02em;
-  }
-
-  .section-body {
-    font-family: 'Lora', serif;
-    font-size: 1rem;
-    line-height: 1.75;
-    color: var(--bark);
-    max-width: 600px;
-  }
-
-  /* PROBLEM SECTION */
-  .problem {
-    background: var(--petal);
-    position: relative;
-    overflow: hidden;
-  }
-  .problem::before {
-    content: '';
-    position: absolute;
-    top: -100px; right: -100px;
-    width: 500px; height: 500px;
-    background: radial-gradient(circle, rgba(140,191,94,0.12) 0%, transparent 70%);
-    pointer-events: none;
-  }
-
-  .problem-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 6rem;
-    margin-top: 5rem;
-  }
-
-  .problem-card {
-    position: relative;
-    padding: 2.5rem;
-    border: 1px solid var(--lichen);
-    border-radius: 4px;
-    background: white;
-    transition: transform 0.3s, box-shadow 0.3s;
-    overflow: hidden;
-  }
-  .problem-card::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0;
-    width: 3px;
-    height: 100%;
-    background: linear-gradient(to bottom, var(--leaf), var(--amber));
-  }
-  .problem-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 20px 40px rgba(45,74,34,0.1);
-  }
-
-  .problem-card-num {
-    font-family: 'Playfair Display', serif;
-    font-size: 4rem;
-    font-weight: 900;
-    color: var(--lichen);
-    line-height: 1;
-    margin-bottom: 1rem;
-  }
-  .problem-card-title {
-    font-family: 'Playfair Display', serif;
-    font-size: 1.3rem;
     font-weight: 700;
-    color: var(--moss);
-    margin-bottom: 0.75rem;
-  }
-  .problem-card p {
-    font-size: 0.9rem;
-    line-height: 1.7;
-    color: var(--bark);
-  }
-  .problem-card-tag {
-    display: inline-block;
-    margin-top: 1rem;
-    font-family: 'DM Mono', monospace;
-    font-size: 0.62rem;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--leaf);
-    background: var(--petal);
-    border: 1px solid var(--lichen);
-    padding: 0.3rem 0.7rem;
-    border-radius: 2px;
   }
 
-  /* WHAT WE BUILD */
-  .product {
-    background: var(--night);
-    color: var(--petal);
-    position: relative;
-    overflow: hidden;
-  }
-  .product::after {
-    content: '';
-    position: absolute;
-    bottom: -200px; right: -200px;
-    width: 600px; height: 600px;
-    background: radial-gradient(circle, rgba(90,145,64,0.08) 0%, transparent 70%);
-    pointer-events: none;
-  }
-
-  .product .section-title { color: var(--petal); }
-  .product .section-body { color: rgba(240,247,230,0.65); }
-
-  .pipeline-visual {
-    margin-top: 4rem;
+  /* HERO STRIP */
+  .hero-strip {
+    background: var(--black);
+    color: var(--white);
+    padding: 2rem 3rem;
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 1px;
-    background: rgba(140,191,94,0.15);
-    border: 1px solid rgba(140,191,94,0.15);
-    border-radius: 4px;
-    overflow: hidden;
+    gap: 0;
+    border-bottom: 4px solid var(--black);
+  }
+
+  .hero-stat {
+    font-family: 'Bebas Neue', sans-serif;
+    border-right: 2px solid #333;
+    padding-right: 2rem;
+    margin-right: 2rem;
+  }
+
+  .hero-stat:last-child { border-right: none; }
+
+  .hero-stat-num {
+    font-size: 3rem;
+    line-height: 1;
+    display: block;
+    color: var(--red);
+  }
+
+  .hero-stat-label {
+    font-size: 0.65rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    font-family: 'Space Mono', monospace;
+    color: var(--concrete);
+  }
+
+  /* LAYOUT */
+  main { max-width: 1400px; margin: 0 auto; }
+
+  section { border-bottom: 4px solid var(--black); }
+
+  .section-inner { padding: 3rem; }
+
+  .section-label {
+    font-size: 0.65rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--mid);
+    margin-bottom: 0.5rem;
+  }
+
+  h2 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(2rem, 5vw, 4rem);
+    line-height: 1;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    margin-bottom: 2rem;
+    border-left: 8px solid var(--red);
+    padding-left: 1rem;
+  }
+
+  h3 {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.78rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 0.5rem;
+  }
+
+  p { margin-bottom: 1rem; max-width: 70ch; }
+  p:last-child { margin-bottom: 0; }
+
+  /* PROBLEM GRID */
+  .problem-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0;
+    border: 4px solid var(--black);
+    margin-top: 2rem;
+  }
+
+  .problem-item {
+    padding: 2rem;
+    border: 2px solid var(--black);
+  }
+
+  .problem-item:nth-child(odd) { border-right: 4px solid var(--black); }
+
+  .problem-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 4rem;
+    line-height: 1;
+    color: var(--concrete);
+    display: block;
+    margin-bottom: 0.5rem;
+  }
+
+  /* BUILD */
+  .build-statement {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(1.5rem, 3vw, 2.5rem);
+    line-height: 1.1;
+    margin-bottom: 2rem;
+  }
+
+  .build-statement em { font-style: normal; color: var(--red); }
+
+  .pipeline {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0;
+    border: 4px solid var(--black);
+    margin-top: 2rem;
   }
 
   .pipeline-step {
-    background: var(--dusk);
-    padding: 2.5rem 2rem;
-    position: relative;
-    transition: background 0.3s;
+    padding: 2rem;
+    border-right: 4px solid var(--black);
   }
-  .pipeline-step:hover { background: rgba(26,48,18,0.9); }
 
-  .pipeline-step-phase {
-    font-family: 'DM Mono', monospace;
-    font-size: 0.62rem;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
-    color: var(--sprout);
-    margin-bottom: 1rem;
-  }
-  .pipeline-step-title {
-    font-family: 'Playfair Display', serif;
-    font-size: 1.4rem;
-    font-weight: 700;
-    color: var(--honey);
-    margin-bottom: 1rem;
-    line-height: 1.2;
-  }
-  .pipeline-step ul {
-    list-style: none;
-  }
-  .pipeline-step ul li {
-    font-family: 'DM Mono', monospace;
-    font-size: 0.75rem;
-    line-height: 1.6;
-    color: var(--lichen);
-    padding-left: 1rem;
-    position: relative;
+  .pipeline-step:last-child { border-right: none; }
+
+  .pipeline-phase {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.5rem;
+    display: block;
     margin-bottom: 0.5rem;
-  }
-  .pipeline-step ul li::before {
-    content: '→';
-    position: absolute;
-    left: 0;
-    color: var(--leaf);
+    color: var(--red);
   }
 
-  /* COMPETITIVE TABLE */
-  .competitive {
-    background: var(--petal);
-    position: relative;
-  }
-
-  .comp-intro {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 6rem;
-    align-items: start;
-    margin-bottom: 5rem;
-  }
-
-  .comp-table {
+  /* TABLE */
+  .raw-table {
     width: 100%;
     border-collapse: collapse;
-    font-family: 'DM Mono', monospace;
-    font-size: 0.8rem;
+    border: 4px solid var(--black);
+    margin-top: 2rem;
+    font-size: 0.75rem;
+  }
+
+  .raw-table th {
+    background: var(--black);
+    color: var(--white);
+    text-align: left;
+    padding: 0.75rem 1rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-size: 0.65rem;
+    border-right: 2px solid #333;
+  }
+
+  .raw-table th:last-child { border-right: none; }
+
+  .raw-table td {
+    padding: 0.75rem 1rem;
+    border: 2px solid var(--black);
+    vertical-align: top;
+  }
+
+  .raw-table tr:nth-child(even) td { background: rgba(0,0,0,0.04); }
+
+  .raw-table tr.us-row td {
+    background: var(--black);
+    color: var(--white);
+    font-weight: 700;
+  }
+
+  /* SEGMENTS */
+  .segment-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0;
+    border: 4px solid var(--black);
     margin-top: 2rem;
   }
-  .comp-table thead th {
-    font-size: 0.65rem;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    color: var(--leaf);
-    border-bottom: 1px solid var(--lichen);
-    padding: 0.75rem 1.25rem;
-    text-align: left;
+
+  .segment-item {
+    padding: 2rem;
+    border: 2px solid var(--black);
   }
-  .comp-table tbody tr {
-    border-bottom: 1px solid rgba(197,223,168,0.4);
-    transition: background 0.2s;
-  }
-  .comp-table tbody tr:hover { background: rgba(197,223,168,0.12); }
-  .comp-table tbody td {
-    padding: 1.25rem;
-    vertical-align: top;
-    color: var(--bark);
-    line-height: 1.5;
-    font-size: 0.78rem;
-  }
-  .comp-table tbody td:first-child {
-    font-weight: 500;
-    color: var(--moss);
-  }
-  .comp-table tr.highlight-row td {
-    background: rgba(90,145,64,0.08);
-    color: var(--moss);
-  }
-  .comp-table tr.highlight-row td:first-child {
-    color: var(--canopy);
-    font-weight: 700;
-  }
-  .badge {
+
+  .segment-item:nth-child(odd) { border-right: 4px solid var(--black); }
+
+  .segment-tag {
     display: inline-block;
+    background: var(--red);
+    color: var(--white);
     font-size: 0.6rem;
+    font-weight: 700;
     letter-spacing: 0.1em;
     text-transform: uppercase;
-    padding: 0.15rem 0.5rem;
-    border-radius: 2px;
-  }
-  .badge-green { background: var(--lichen); color: var(--moss); }
-  .badge-amber { background: var(--honey); color: var(--bark); }
-
-  /* WHO WE SERVE */
-  .audience {
-    background: white;
-    position: relative;
-    overflow: hidden;
-  }
-
-  .audience::before {
-    content: '';
-    position: absolute;
-    top: 0; right: 0; bottom: 0;
-    width: 40%;
-    background: linear-gradient(135deg, var(--petal) 0%, var(--lichen) 100%);
-    opacity: 0.4;
-    clip-path: polygon(20% 0%, 100% 0%, 100% 100%, 0% 100%);
-  }
-
-  .audience-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 2rem;
-    margin-top: 4rem;
-  }
-
-  .audience-card {
-    padding: 2.5rem;
-    border: 1px solid var(--lichen);
-    border-radius: 4px;
-    background: white;
-    position: relative;
-    transition: transform 0.3s, box-shadow 0.3s;
-  }
-  .audience-card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 12px 32px rgba(45,74,34,0.08);
-  }
-
-  .audience-flag {
-    font-family: 'DM Mono', monospace;
-    font-size: 0.62rem;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    color: white;
-    background: var(--leaf);
-    padding: 0.3rem 0.7rem;
-    border-radius: 2px;
-    display: inline-block;
-    margin-bottom: 1.25rem;
-  }
-  .audience-flag.amber { background: var(--amber); }
-  .audience-flag.bark { background: var(--bark); }
-  .audience-flag.terracotta { background: var(--terracotta); }
-
-  .audience-card-title {
-    font-family: 'Playfair Display', serif;
-    font-size: 1.3rem;
-    font-weight: 700;
-    color: var(--moss);
+    padding: 0.2rem 0.5rem;
     margin-bottom: 0.75rem;
   }
-  .audience-card p {
-    font-size: 0.9rem;
-    line-height: 1.7;
-    color: var(--bark);
-  }
-  .audience-card-note {
-    margin-top: 1rem;
-    font-family: 'DM Mono', monospace;
-    font-size: 0.7rem;
-    color: var(--leaf);
-    font-style: italic;
+
+  /* PHASES */
+  .phase-list {
+    margin-top: 2rem;
+    border: 4px solid var(--black);
   }
 
-  /* PRICING */
-  .pricing {
-    background: var(--cream);
-    position: relative;
-  }
-
-  .pricing-grid {
+  .phase-item {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 1.5rem;
-    margin-top: 4rem;
+    grid-template-columns: 180px 1fr;
+    border-bottom: 4px solid var(--black);
   }
 
-  .price-card {
-    border: 1px solid var(--lichen);
-    border-radius: 4px;
-    overflow: hidden;
-    background: white;
-    transition: transform 0.3s, box-shadow 0.3s;
+  .phase-item:last-child { border-bottom: none; }
+
+  .phase-label {
+    background: var(--black);
+    color: var(--white);
+    padding: 2rem;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.5rem;
     display: flex;
     flex-direction: column;
-  }
-  .price-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 16px 36px rgba(45,74,34,0.1);
-  }
-  .price-card.featured {
-    border-color: var(--leaf);
-    box-shadow: 0 0 0 2px rgba(90,145,64,0.15);
+    justify-content: center;
+    border-right: 4px solid var(--red);
   }
 
-  .price-header {
-    padding: 2rem;
-    background: var(--petal);
-    border-bottom: 1px solid var(--lichen);
-  }
-  .price-card.featured .price-header {
-    background: var(--canopy);
-  }
-
-  .price-tier {
-    font-family: 'DM Mono', monospace;
-    font-size: 0.65rem;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
-    color: var(--leaf);
-    margin-bottom: 0.75rem;
-  }
-  .price-card.featured .price-tier { color: var(--sprout); }
-
-  .price-amount {
-    font-family: 'Playfair Display', serif;
-    font-size: 2rem;
-    font-weight: 900;
-    color: var(--moss);
-    line-height: 1;
-  }
-  .price-card.featured .price-amount { color: var(--honey); }
-  .price-amount sub {
-    font-size: 1rem;
+  .phase-label small {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.6rem;
+    color: var(--concrete);
     font-weight: 400;
-    vertical-align: baseline;
-    color: var(--earth);
-  }
-  .price-card.featured .price-amount sub { color: var(--sprout); }
-
-  .price-body {
-    padding: 2rem;
-    flex: 1;
-  }
-  .price-target {
-    font-family: 'Lora', serif;
-    font-size: 0.85rem;
-    font-style: italic;
-    color: var(--earth);
-    margin-bottom: 1.5rem;
-    line-height: 1.5;
-  }
-  .price-features { list-style: none; }
-  .price-features li {
-    font-family: 'DM Mono', monospace;
-    font-size: 0.72rem;
-    color: var(--bark);
-    padding: 0.4rem 0;
-    border-bottom: 1px solid rgba(197,223,168,0.3);
-    display: flex; gap: 0.5rem;
-  }
-  .price-features li::before { content: '✓'; color: var(--leaf); flex-shrink: 0; }
-
-  /* ROADMAP */
-  .roadmap {
-    background: var(--night);
-    color: var(--petal);
-    position: relative;
-    overflow: hidden;
-  }
-  .roadmap .section-title { color: var(--petal); }
-
-  .timeline {
-    margin-top: 4rem;
-    position: relative;
-    padding-left: 3rem;
-  }
-  .timeline::before {
-    content: '';
-    position: absolute;
-    left: 0.75rem; top: 0; bottom: 0;
-    width: 1px;
-    background: linear-gradient(to bottom, var(--leaf), transparent);
-  }
-
-  .timeline-item {
-    position: relative;
-    margin-bottom: 3.5rem;
-    padding-left: 2rem;
-  }
-  .timeline-item::before {
-    content: '';
-    position: absolute;
-    left: -2.375rem;
-    top: 0.35rem;
-    width: 10px; height: 10px;
-    border-radius: 50%;
-    background: var(--leaf);
-    box-shadow: 0 0 0 3px rgba(90,145,64,0.2);
-  }
-  .timeline-item.future::before { background: var(--amber); box-shadow: 0 0 0 3px rgba(201,124,42,0.2); }
-
-  .timeline-phase {
-    font-family: 'DM Mono', monospace;
-    font-size: 0.65rem;
-    letter-spacing: 0.18em;
     text-transform: uppercase;
-    color: var(--sprout);
-    margin-bottom: 0.5rem;
-  }
-  .timeline-title {
-    font-family: 'Playfair Display', serif;
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: var(--honey);
-    margin-bottom: 0.75rem;
-  }
-  .timeline-body {
-    font-size: 0.9rem;
-    line-height: 1.7;
-    color: rgba(240,247,230,0.6);
-    max-width: 600px;
+    letter-spacing: 0.1em;
+    margin-bottom: 0.25rem;
   }
 
-  /* MODEL LANDSCAPE */
-  .models {
-    background: var(--petal);
-    overflow: hidden;
-  }
+  .phase-content { padding: 2rem; }
 
-  .models-grid {
+  /* MONETIZATION */
+  .tier-grid {
     display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    gap: 1rem;
-    margin-top: 4rem;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0;
+    border: 4px solid var(--black);
+    margin-top: 2rem;
   }
 
-  .model-tier-card {
-    padding: 1.5rem;
-    border-radius: 4px;
-    border: 1px solid;
-    transition: transform 0.2s;
+  .tier-item {
+    padding: 2rem;
+    border-right: 4px solid var(--black);
   }
-  .model-tier-card:hover { transform: translateY(-3px); }
 
-  .model-tier-card:nth-child(1) { border-color: var(--sprout); background: rgba(140,191,94,0.1); }
-  .model-tier-card:nth-child(2) { border-color: var(--leaf); background: rgba(90,145,64,0.1); }
-  .model-tier-card:nth-child(3) { border-color: var(--canopy); background: rgba(61,107,46,0.1); }
-  .model-tier-card:nth-child(4) { border-color: var(--amber); background: rgba(201,124,42,0.08); }
-  .model-tier-card:nth-child(5) { border-color: var(--terracotta); background: rgba(194,107,66,0.08); }
+  .tier-item:last-child { border-right: none; }
 
-  .model-tier-name {
-    font-family: 'DM Mono', monospace;
-    font-size: 0.65rem;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    color: var(--leaf);
-    margin-bottom: 0.5rem;
+  .tier-price {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 2rem;
+    display: block;
+    margin: 0.5rem 0;
+    color: var(--red);
   }
-  .model-tier-range {
-    font-family: 'Playfair Display', serif;
-    font-size: 1.1rem;
-    font-weight: 700;
-    color: var(--moss);
-    margin-bottom: 0.75rem;
+
+  .tier-item.featured {
+    background: var(--black);
+    color: var(--white);
   }
-  .model-tier-card p {
-    font-size: 0.78rem;
-    line-height: 1.6;
-    color: var(--bark);
+
+  .tier-item.featured .tier-price { color: var(--red); }
+
+  /* MOAT */
+  .moat {
+    background: var(--black);
+    color: var(--white);
+    padding: 4rem 3rem;
+    border-bottom: 4px solid var(--red);
   }
+
+  .moat-text {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(2rem, 5vw, 4rem);
+    line-height: 1.05;
+  }
+
+  .moat-text span { color: var(--red); }
 
   /* FOOTER */
   footer {
-    background: var(--night);
-    padding: 5rem 6rem 3rem;
-    position: relative;
-    overflow: hidden;
-  }
-  footer::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 1px;
-    background: linear-gradient(to right, transparent, var(--leaf), transparent);
-  }
-
-  .footer-grid {
-    display: grid;
-    grid-template-columns: 2fr 1fr 1fr 1fr;
-    gap: 4rem;
-    margin-bottom: 4rem;
-  }
-
-  .footer-brand-name {
-    font-family: 'Playfair Display', serif;
-    font-size: 1.5rem;
-    font-weight: 900;
-    color: var(--petal);
-    margin-bottom: 0.75rem;
-  }
-  .footer-brand-tagline {
-    font-family: 'Lora', serif;
-    font-style: italic;
-    font-size: 0.9rem;
-    color: rgba(240,247,230,0.45);
-    line-height: 1.6;
-  }
-
-  .footer-col-title {
-    font-family: 'DM Mono', monospace;
+    background: var(--black);
+    color: var(--concrete);
+    padding: 2rem 3rem;
     font-size: 0.65rem;
-    letter-spacing: 0.18em;
+    letter-spacing: 0.1em;
     text-transform: uppercase;
-    color: var(--sprout);
-    margin-bottom: 1.25rem;
-  }
-  .footer-col ul { list-style: none; }
-  .footer-col ul li {
-    margin-bottom: 0.6rem;
-  }
-  .footer-col ul a {
-    font-family: 'DM Mono', monospace;
-    font-size: 0.78rem;
-    color: rgba(240,247,230,0.45);
-    text-decoration: none;
-    transition: color 0.2s;
-  }
-  .footer-col ul a:hover { color: var(--sprout); }
-
-  .footer-bottom {
-    border-top: 1px solid rgba(140,191,94,0.1);
-    padding-top: 2rem;
     display: flex;
     justify-content: space-between;
     align-items: center;
-  }
-  .footer-bottom p {
-    font-family: 'DM Mono', monospace;
-    font-size: 0.68rem;
-    color: rgba(240,247,230,0.3);
-    letter-spacing: 0.08em;
-  }
-  .footer-manifesto {
-    font-family: 'Playfair Display', serif;
-    font-style: italic;
-    font-size: 0.85rem;
-    color: rgba(240,247,230,0.35);
+    border-top: 6px solid var(--red);
   }
 
-  /* DECORATIVE VINES */
-  .vine-deco {
-    position: absolute;
-    pointer-events: none;
-    opacity: 0.08;
-  }
-
-  /* ANIMATIONS on load */
-  .fade-up {
-    opacity: 0;
-    transform: translateY(24px);
-    transition: opacity 0.7s ease, transform 0.7s ease;
-  }
-  .fade-up.visible {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  footer strong { color: var(--white); }
 
   /* RESPONSIVE */
-  @media (max-width: 1100px) {
-    .hero { grid-template-columns: 1fr; }
-    .hero-right { display: none; }
-    .hero-left { padding: 10rem 4rem 6rem; }
-    .problem-grid, .comp-intro, .audience-grid { grid-template-columns: 1fr; }
-    .pricing-grid { grid-template-columns: 1fr 1fr; }
-    .models-grid { grid-template-columns: 1fr 1fr 1fr; }
-    .pipeline-visual { grid-template-columns: 1fr; }
-    section { padding: 5rem 3rem; }
-    .footer-grid { grid-template-columns: 1fr 1fr; }
+  @media (max-width: 900px) {
+    .header-inner { grid-template-columns: 1fr; }
+    .header-meta { text-align: left; }
+    .problem-grid, .segment-grid { grid-template-columns: 1fr; }
+    .problem-item:nth-child(odd), .segment-item:nth-child(odd) { border-right: 2px solid var(--black); }
+    .pipeline { grid-template-columns: 1fr; }
+    .pipeline-step { border-right: none; border-bottom: 4px solid var(--black); }
+    .pipeline-step:last-child { border-bottom: none; }
+    .tier-grid { grid-template-columns: repeat(2, 1fr); }
+    .tier-item:nth-child(2) { border-right: none; }
+    .phase-item { grid-template-columns: 1fr; }
+    .phase-label { padding: 1rem 2rem; border-right: none; border-bottom: 4px solid var(--red); }
+    .hero-strip { grid-template-columns: 1fr; }
+    .hero-stat { border-right: none; border-bottom: 2px solid #333; padding-bottom: 1.5rem; margin-bottom: 1.5rem; padding-right: 0; margin-right: 0; }
+    .hero-stat:last-child { border-bottom: none; margin-bottom: 0; }
+    .section-inner, .moat, footer { padding: 2rem 1.5rem; }
+    .tagline { padding: 0.75rem 1.5rem; }
   }
 
   @media (max-width: 600px) {
-    .pricing-grid, .models-grid { grid-template-columns: 1fr; }
-    section { padding: 4rem 1.5rem; }
-    nav { padding: 1rem 1.5rem; }
-    nav ul { display: none; }
-    footer { padding: 4rem 1.5rem 2rem; }
-    .footer-grid { grid-template-columns: 1fr; }
-  }
-
-  /* HIGHLIGHT ELEMENT */
-  .highlight-box {
-    background: linear-gradient(135deg, rgba(90,145,64,0.08), rgba(201,124,42,0.06));
-    border: 1px solid var(--lichen);
-    border-left: 4px solid var(--leaf);
-    padding: 1.5rem 2rem;
-    border-radius: 0 4px 4px 0;
-    margin: 2rem 0;
-    font-family: 'Lora', serif;
-    font-style: italic;
-    font-size: 1.05rem;
-    line-height: 1.7;
-    color: var(--canopy);
+    .tier-grid { grid-template-columns: 1fr; }
+    .tier-item { border-right: none; border-bottom: 4px solid var(--black); }
+    .tier-item:last-child { border-bottom: none; }
+    .raw-table { font-size: 0.68rem; }
+    .raw-table th, .raw-table td { padding: 0.5rem 0.6rem; }
+    footer { flex-direction: column; gap: 0.5rem; text-align: center; }
   }
 </style>
 </head>
 <body>
 
-<!-- CURSOR -->
-<div class="cursor" id="cursor"></div>
-<div class="cursor-ring" id="cursor-ring"></div>
-
-<!-- NAV -->
-<nav>
-  <div class="nav-logo">
-    <div class="leaf-icon"></div>
-    SMM
-  </div>
-  <ul>
-    <li><a href="#problem">Problem</a></li>
-    <li><a href="#product">Product</a></li>
-    <li><a href="#audience">Customers</a></li>
-    <li><a href="#pricing">Pricing</a></li>
-    <li><a href="#roadmap">Roadmap</a></li>
-  </ul>
-  <button class="nav-cta">Get Early Access</button>
-</nav>
-
-<!-- HERO -->
-<section class="hero" id="top">
-  <div class="hero-left">
-    <p class="hero-eyebrow">On-Device AI Infrastructure</p>
-    <h1 class="hero-title">
-      Run any <em>model</em>,<br>
-      on any <span class="accent-word">device</span>,<br>
-      right now.
-    </h1>
-    <p class="hero-sub">
-      We are the reliability and distribution layer between any model and any device — solving chip fragmentation, thermal throttling, and OS fragmentation, so you never have to.
-    </p>
-    <div class="hero-actions">
-      <button class="btn-primary">Explore the SDK</button>
-      <button class="btn-ghost">View Marketplace</button>
+<header>
+  <div class="header-inner">
+    <div class="site-title">SMALL<br>MODEL<br><span>MARKET</span><br>PLACE</div>
+    <div class="header-meta">
+      On-device AI<br>Infrastructure<br>——<br>Run any model<br>Any device<br>Right now
     </div>
   </div>
-  <div class="hero-right">
-    <div class="hero-botanical">
-      <!-- Botanical / circuit hybrid SVG -->
-      <svg class="botanical-svg" viewBox="0 0 600 600" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <!-- Background radial glow -->
-        <circle cx="300" cy="300" r="240" fill="url(#glow)" opacity="0.3"/>
-        <!-- Central node -->
-        <circle cx="300" cy="300" r="18" fill="#5a9140" opacity="0.9"/>
-        <circle cx="300" cy="300" r="30" fill="none" stroke="#5a9140" stroke-width="1" opacity="0.4"/>
-        <circle cx="300" cy="300" r="50" fill="none" stroke="#5a9140" stroke-width="0.5" opacity="0.2"/>
+  <div class="tagline">We don't make models &mdash; We make models shippable.</div>
+</header>
 
-        <!-- Circuit branches (stems) -->
-        <line x1="300" y1="300" x2="300" y2="120" stroke="#3d6b2e" stroke-width="1.5"/>
-        <line x1="300" y1="300" x2="180" y2="200" stroke="#3d6b2e" stroke-width="1.5"/>
-        <line x1="300" y1="300" x2="420" y2="200" stroke="#3d6b2e" stroke-width="1.5"/>
-        <line x1="300" y1="300" x2="480" y2="380" stroke="#3d6b2e" stroke-width="1.5"/>
-        <line x1="300" y1="300" x2="120" y2="380" stroke="#3d6b2e" stroke-width="1.5"/>
-        <line x1="300" y1="300" x2="300" y2="490" stroke="#3d6b2e" stroke-width="1.5"/>
-
-        <!-- Device nodes at branch ends -->
-        <rect x="275" y="95" width="50" height="28" rx="4" fill="#1a3012" stroke="#5a9140" stroke-width="1"/>
-        <text x="300" y="114" text-anchor="middle" font-family="monospace" font-size="9" fill="#8cbf5e">iPhone</text>
-
-        <rect x="148" y="185" width="50" height="28" rx="4" fill="#1a3012" stroke="#5a9140" stroke-width="1"/>
-        <text x="173" y="204" text-anchor="middle" font-family="monospace" font-size="9" fill="#8cbf5e">Pixel</text>
-
-        <rect x="397" y="185" width="58" height="28" rx="4" fill="#1a3012" stroke="#5a9140" stroke-width="1"/>
-        <text x="426" y="204" text-anchor="middle" font-family="monospace" font-size="9" fill="#8cbf5e">Galaxy</text>
-
-        <rect x="455" y="365" width="52" height="28" rx="4" fill="#1a3012" stroke="#c97c2a" stroke-width="1"/>
-        <text x="481" y="384" text-anchor="middle" font-family="monospace" font-size="9" fill="#e8a93c">Mac M-</text>
-
-        <rect x="94" y="365" width="52" height="28" rx="4" fill="#1a3012" stroke="#c97c2a" stroke-width="1"/>
-        <text x="120" y="384" text-anchor="middle" font-family="monospace" font-size="9" fill="#e8a93c">Watch</text>
-
-        <rect x="275" y="463" width="50" height="28" rx="4" fill="#1a3012" stroke="#5a9140" stroke-width="1"/>
-        <text x="300" y="482" text-anchor="middle" font-family="monospace" font-size="9" fill="#8cbf5e">Tablet</text>
-
-        <!-- Leaf nodes along branches -->
-        <!-- Leaf 1 -->
-        <ellipse cx="300" cy="200" rx="22" ry="12" fill="#2d4a22" stroke="#5a9140" stroke-width="0.8" transform="rotate(-20,300,200)"/>
-        <!-- Leaf 2 -->
-        <ellipse cx="238" cy="248" rx="18" ry="10" fill="#2d4a22" stroke="#5a9140" stroke-width="0.8" transform="rotate(40,238,248)"/>
-        <!-- Leaf 3 -->
-        <ellipse cx="362" cy="248" rx="18" ry="10" fill="#2d4a22" stroke="#5a9140" stroke-width="0.8" transform="rotate(-40,362,248)"/>
-        <!-- Leaf 4 -->
-        <ellipse cx="392" cy="342" rx="20" ry="10" fill="#2d4a22" stroke="#8cbf5e" stroke-width="0.8" transform="rotate(25,392,342)"/>
-        <!-- Leaf 5 -->
-        <ellipse cx="208" cy="342" rx="20" ry="10" fill="#2d4a22" stroke="#8cbf5e" stroke-width="0.8" transform="rotate(-25,208,342)"/>
-
-        <!-- Chip icons - small squares representing NPU/GPU/CPU -->
-        <rect x="288" y="258" width="24" height="24" rx="2" fill="#1a3012" stroke="#c97c2a" stroke-width="0.8"/>
-        <text x="300" y="274" text-anchor="middle" font-family="monospace" font-size="7" fill="#e8a93c">NPU</text>
-        <rect x="316" y="258" width="24" height="24" rx="2" fill="#1a3012" stroke="#5a9140" stroke-width="0.8"/>
-        <text x="328" y="274" text-anchor="middle" font-family="monospace" font-size="7" fill="#8cbf5e">GPU</text>
-        <rect x="260" y="258" width="24" height="24" rx="2" fill="#1a3012" stroke="#5a9140" stroke-width="0.8"/>
-        <text x="272" y="274" text-anchor="middle" font-family="monospace" font-size="7" fill="#8cbf5e">CPU</text>
-
-        <!-- Pulsing rings on center node -->
-        <circle cx="300" cy="300" r="18" fill="none" stroke="#5a9140" stroke-width="1" opacity="0.6">
-          <animate attributeName="r" from="18" to="80" dur="3s" repeatCount="indefinite"/>
-          <animate attributeName="opacity" from="0.6" to="0" dur="3s" repeatCount="indefinite"/>
-        </circle>
-        <circle cx="300" cy="300" r="18" fill="none" stroke="#8cbf5e" stroke-width="0.5" opacity="0.4">
-          <animate attributeName="r" from="18" to="80" dur="3s" begin="1s" repeatCount="indefinite"/>
-          <animate attributeName="opacity" from="0.4" to="0" dur="3s" begin="1s" repeatCount="indefinite"/>
-        </circle>
-
-        <!-- Gradient defs -->
-        <defs>
-          <radialGradient id="glow" cx="50%" cy="50%" r="50%">
-            <stop offset="0%" stop-color="#5a9140"/>
-            <stop offset="100%" stop-color="transparent"/>
-          </radialGradient>
-        </defs>
-
-        <!-- Small dotted grid -->
-        <pattern id="dots" x="0" y="0" width="30" height="30" patternUnits="userSpaceOnUse">
-          <circle cx="1" cy="1" r="0.8" fill="#3d6b2e" opacity="0.5"/>
-        </pattern>
-        <rect x="0" y="0" width="600" height="600" fill="url(#dots)" opacity="0.3"/>
-      </svg>
-    </div>
-    <div class="floating-stat">
-      <span class="stat-num">Day 1</span>
-      <span class="stat-label">New hardware support SLA</span>
-    </div>
-    <div class="floating-stat">
-      <span class="stat-num">∞</span>
-      <span class="stat-label">Device types supported</span>
-    </div>
-    <div class="floating-stat">
-      <span class="stat-num">0₸</span>
-      <span class="stat-label">Cloud API cost per inference</span>
-    </div>
+<div class="hero-strip">
+  <div class="hero-stat">
+    <span class="hero-stat-num">ANY</span>
+    <span class="hero-stat-label">Device. No exceptions.</span>
   </div>
-
-  <div class="scroll-hint">
-    <span>Scroll</span>
-    <div class="arrow"></div>
+  <div class="hero-stat">
+    <span class="hero-stat-num">1</span>
+    <span class="hero-stat-label">SDK. One integration.</span>
   </div>
-</section>
-
-<!-- TAGLINE BAND -->
-<div class="tagline-band">
-  <div class="tagline-track">
-    <span>Run Any Model</span> · On Any Device · No Cloud Required · Privacy by Default ·
-    <span>ANE. NPU. GPU. CPU.</span> · Cross-Platform Inference · Chip Split Visibility ·
-    <span>Day 1 Hardware Support</span> · Production Telemetry · Marketplace Distribution ·
-    <span>Run Any Model</span> · On Any Device · No Cloud Required · Privacy by Default ·
-    <span>ANE. NPU. GPU. CPU.</span> · Cross-Platform Inference · Chip Split Visibility ·
-    <span>Day 1 Hardware Support</span> · Production Telemetry · Marketplace Distribution ·
+  <div class="hero-stat">
+    <span class="hero-stat-num">DAY 1</span>
+    <span class="hero-stat-label">New hardware support.</span>
   </div>
 </div>
 
-<!-- PROBLEM -->
-<section class="problem" id="problem">
-  <div class="section-label">The Problem</div>
-  <h2 class="section-title">The infrastructure<br>is broken.</h2>
-  <p class="section-body">Apple's Neural Engine sits idle. Android depends on the cloud. CoreML fails in production. Developers are left debugging fragmented hardware with zero visibility.</p>
+<main>
 
-  <div class="problem-grid">
-    <div class="problem-card fade-up">
-      <div class="problem-card-num">01</div>
-      <div class="problem-card-title">Underdeveloped Infrastructure</div>
-      <p>Apple Intelligence is locked to new hardware. The ANE chip sits unused in most iPhones because Apple's own tooling can't expose it consistently. CoreML is unreliable in production. Developers are fighting hardware they don't control.</p>
-      <span class="problem-card-tag">ANE · CoreML · NNAPI</span>
-    </div>
-    <div class="problem-card fade-up">
-      <div class="problem-card-num">02</div>
-      <div class="problem-card-title">Flat, Ongoing Cloud Cost</div>
-      <p>Developers want AI that's invisible — OCR, intent parsing, classification. Cloud APIs create ongoing costs and a hard dependency. Every inference is a billing event. Every outage is your outage.</p>
-      <span class="problem-card-tag">Cost Elimination</span>
-    </div>
-    <div class="problem-card fade-up">
-      <div class="problem-card-num">03</div>
-      <div class="problem-card-title">Privacy & Compliance</div>
-      <p>Personal data that never leaves the device eliminates entire categories of GDPR, CCPA, and HIPAA exposure. On-device inference keeps user data out of third-party cloud infrastructure entirely.</p>
-      <span class="problem-card-tag">GDPR · HIPAA · CCPA</span>
-    </div>
-    <div class="problem-card fade-up">
-      <div class="problem-card-num">04</div>
-      <div class="problem-card-title">Hardware Fragmentation</div>
-      <p>Apple calls it the Neural Engine. Qualcomm calls it Hexagon. Google ships TPUs on Pixel phones. Every chipset is different — and when you split workloads across GPU, CPU, and NPU simultaneously, complexity explodes.</p>
-      <span class="problem-card-tag">Hexagon · A18 · Tensor G4</span>
-    </div>
-  </div>
-</section>
-
-<!-- PRODUCT -->
-<section class="product" id="product">
-  <div class="section-label" style="color: var(--sprout);">What We Build</div>
-  <h2 class="section-title">Infrastructure.<br>Not models.</h2>
-  <p class="section-body">We make models shippable. An SDK and platform that reliably runs small models on any device hardware — handling chip routing, optimization, and reliability — so developers never have to think about it.</p>
-
-  <div class="highlight-box" style="border-left-color: var(--gold); background: rgba(232,169,60,0.07); color: var(--honey); border-color: rgba(232,169,60,0.2);">
-    "Put your model in. We handle every device. You get full visibility into how."
-  </div>
-
-  <div class="pipeline-visual">
-    <div class="pipeline-step">
-      <div class="pipeline-step-phase">Phase 1 — Pre-Ship</div>
-      <div class="pipeline-step-title">Optimize & Predict</div>
-      <ul>
-        <li>Automatic model optimization for target device profiles</li>
-        <li>Chip split visibility — GPU vs CPU vs NPU per device class</li>
-        <li>Estimated latency and memory footprint before shipping</li>
-        <li>Flags models that won't run acceptably before users see them</li>
-      </ul>
-    </div>
-    <div class="pipeline-step" style="border-left: 1px solid rgba(140,191,94,0.15); border-right: 1px solid rgba(140,191,94,0.15);">
-      <div class="pipeline-step-phase">Phase 2 — At-Ship</div>
-      <div class="pipeline-step-title">Dead Simple Integration</div>
-      <ul>
-        <li>Single SDK regardless of device or OS</li>
-        <li>Write once — SDK handles CoreML / NNAPI / QNN routing</li>
-        <li>Model bundling, download management, staged loading built in</li>
-        <li>Day 1 support for new hardware releases</li>
-      </ul>
-    </div>
-    <div class="pipeline-step">
-      <div class="pipeline-step-phase">Phase 3 — Post-Ship</div>
-      <div class="pipeline-step-title">Production Observability</div>
-      <ul>
-        <li>Real user device telemetry — actual latency, memory, thermal events</li>
-        <li>Segmented by device model, OS version, and chip generation</li>
-        <li>Drift detection when performance degrades after OS updates</li>
-        <li>The Datadog moment for on-device AI</li>
-      </ul>
-    </div>
-  </div>
-</section>
-
-<!-- COMPETITIVE -->
-<section class="competitive" id="competitive">
-  <div class="comp-intro">
-    <div>
-      <div class="section-label">Landscape</div>
-      <h2 class="section-title">Why existing tools fall short.</h2>
-    </div>
-    <div>
-      <p class="section-body" style="margin-top: 3rem;">
-        Every major alternative is open-source with no monetization incentive to stay current. When Apple ships a new chip, ONNX and CoreML wrappers lag. We guarantee Day 1 support because our revenue depends on it.
-      </p>
-      <div class="highlight-box">
-        The sustainability gap is as real as the technical gap.
+  <section>
+    <div class="section-inner">
+      <div class="section-label">// The problem</div>
+      <h2>Why nothing works</h2>
+      <div class="problem-grid">
+        <div class="problem-item">
+          <span class="problem-num">01</span>
+          <h3>Broken Infrastructure</h3>
+          <p>Apple Intelligence is locked to new hardware. Android depends on cloud-based Gemini. CoreML is unreliable in production. The ANE chip sits unused in most iPhones because Apple's own tooling can't expose it consistently.</p>
+        </div>
+        <div class="problem-item">
+          <span class="problem-num">02</span>
+          <h3>Flat Cloud Costs</h3>
+          <p>Developers want AI that's invisible — OCR, intent parsing, classification. Cloud APIs create ongoing costs and a hard dependency. Every call costs money. It doesn't have to.</p>
+        </div>
+        <div class="problem-item">
+          <span class="problem-num">03</span>
+          <h3>Privacy &amp; Compliance</h3>
+          <p>Hard or impossible to implement GDPR, CCPA, HIPAA, SOC 2 through a normal server. On-device processing eliminates entire categories of data transfer requirements. Data that never leaves the device is data regulators can't touch.</p>
+        </div>
+        <div class="problem-item">
+          <span class="problem-num">04</span>
+          <h3>Hardware Fragmentation</h3>
+          <p>Apple calls it Neural Engine. Qualcomm calls it Hexagon. Google ships TPUs on Pixel phones. Every chipset is different. No universal standard. Gets worse every year as new silicon ships.</p>
+        </div>
       </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-inner">
+      <div class="section-label">// What we build</div>
+      <h2>The Solution</h2>
+      <div class="build-statement">
+        An SDK that reliably runs small models on <em>any device hardware</em> — handling chip routing, optimization, and reliability so developers don't have to. On top of that, a marketplace where model creators distribute specialized models directly to developers.
+      </div>
+      <div class="pipeline">
+        <div class="pipeline-step">
+          <span class="pipeline-phase">Pre-Ship</span>
+          <h3>Optimize &amp; Predict</h3>
+          <p>Automatic model optimization for target device profiles. Chip split visibility — GPU vs CPU vs NPU per device class. Estimated latency and memory footprint before you ship. Flags models that won't run acceptably before they reach users.</p>
+        </div>
+        <div class="pipeline-step">
+          <span class="pipeline-phase">At-Ship</span>
+          <h3>Dead Simple Integration</h3>
+          <p>Single SDK regardless of device or OS. Write once — SDK handles CoreML / NNAPI / QNN routing underneath. Model bundling, download management, and staged loading built in.</p>
+        </div>
+        <div class="pipeline-step">
+          <span class="pipeline-phase">Post-Ship</span>
+          <h3>Production Observability</h3>
+          <p>Real user device telemetry — actual latency, memory, thermal events, failures. Segmented by device model, OS version, and chip generation. Drift detection when performance degrades after OS updates.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="moat">
+    <div class="moat-text">
+      Put your model in.<br>
+      We handle <span>every device.</span><br>
+      You get full visibility into how.
     </div>
   </div>
 
-  <table class="comp-table">
-    <thead>
-      <tr>
-        <th>Tool</th>
-        <th>Technical Reality</th>
-        <th>Sustainability</th>
-        <th>Critical Gap</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td>ONNX Runtime</td>
-        <td>Wraps CoreML — no direct ANE access. Static workload routing. Cloud-first design.</td>
-        <td>Community-maintained. No revenue incentive for new hardware updates.</td>
-        <td>No production telemetry. No chip split visibility. Inconsistent device reliability.</td>
-      </tr>
-      <tr>
-        <td>CoreML</td>
-        <td>Apple-native. Best ANE access available. Apple-only by definition.</td>
-        <td>Apple-maintained but incentive is ecosystem lock-in, not developer productivity.</td>
-        <td>Poorly documented edge cases. Reliability varies across A-series generations.</td>
-      </tr>
-      <tr>
-        <td>TFLite / LiteRT</td>
-        <td>Google's edge inference answer. Delegate system for hardware acceleration.</td>
-        <td>Google-maintained. History of sunsetting developer tools without warning.</td>
-        <td>NNAPI delegate inconsistent. No production observability. No chip visibility.</td>
-      </tr>
-      <tr class="highlight-row">
-        <td>SMM <span class="badge badge-green">Us</span></td>
-        <td>Abstracts all backends (CoreML, NNAPI, QNN). Dynamic runtime routing. Single SDK.</td>
-        <td>B2B SaaS — revenue directly aligned with staying current. Paid SLAs.</td>
-        <td>Pre-ship optimization + chip split visibility + post-ship telemetry. Full stack. <span class="badge badge-amber">Unique</span></td>
-      </tr>
-    </tbody>
-  </table>
-</section>
-
-<!-- AUDIENCE -->
-<section class="audience" id="audience">
-  <div class="section-label">Who We Serve</div>
-  <h2 class="section-title">Four segments.<br>One platform.</h2>
-  <p class="section-body">From blocked developers in China to compliance-bound teams in Berlin to high-volume apps bleeding on API costs — the pitch changes. The solution doesn't.</p>
-
-  <div class="audience-grid">
-    <div class="audience-card fade-up">
-      <span class="audience-flag">Day-One TAM</span>
-      <div class="audience-card-title">Chinese iOS Developers</div>
-      <p>Legally blocked from Western cloud APIs. The pitch is not cheaper — it is the only viable option. Strong OCR and translation use cases fit the small model specification perfectly.</p>
-      <div class="audience-card-note">High urgency. Strong fit. Immediate revenue potential.</div>
+  <section>
+    <div class="section-inner">
+      <div class="section-label">// Competitive landscape</div>
+      <h2>Why the alternatives fail</h2>
+      <p>The closest existing solution is ONNX Runtime (2018). Every major alternative is open-source with no monetization incentive to stay current. When Apple ships a new chip generation, wrappers lag. We guarantee Day 1 support because our revenue depends on it.</p>
+      <table class="raw-table">
+        <thead>
+          <tr>
+            <th>Tool</th>
+            <th>Technical Reality</th>
+            <th>Sustainability</th>
+            <th>Gap</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>ONNX Runtime</strong></td>
+            <td>Wraps CoreML — no direct ANE access. Static workload routing. Cloud-first design.</td>
+            <td>Community-maintained. No revenue incentive to update for new hardware.</td>
+            <td>No production telemetry. No chip split visibility. Inconsistent device reliability.</td>
+          </tr>
+          <tr>
+            <td><strong>CoreML</strong></td>
+            <td>Apple-native. Best ANE access available. Apple-only by definition.</td>
+            <td>Incentive is ecosystem lock-in, not cross-platform support.</td>
+            <td>Poorly documented edge cases. Reliability varies across A-series generations.</td>
+          </tr>
+          <tr>
+            <td><strong>TFLite / LiteRT</strong></td>
+            <td>Google's edge inference answer. Delegate system for hardware acceleration.</td>
+            <td>Google-maintained. History of sunsetting developer tools.</td>
+            <td>NNAPI delegate is inconsistent. No production observability.</td>
+          </tr>
+          <tr class="us-row">
+            <td><strong>&rarr; US</strong></td>
+            <td>Abstracts all backends (CoreML, NNAPI, QNN). Dynamic runtime routing. Single SDK.</td>
+            <td>B2B SaaS — revenue aligned with staying current. Paid SLAs.</td>
+            <td>Pre-ship optimization + chip split visibility + post-ship telemetry. Full stack.</td>
+          </tr>
+        </tbody>
+      </table>
     </div>
-    <div class="audience-card fade-up">
-      <span class="audience-flag amber">Privacy Leaders</span>
-      <div class="audience-card-title">EU / GDPR Developers</div>
-      <p>"Never leaves the device" eliminates their legal review entirely. Strong signal in German and Dutch indie dev communities. The sales conversation simplifies to: eliminate complex GDPR integration.</p>
-      <div class="audience-card-note">Privacy angle makes the pitch obvious.</div>
-    </div>
-    <div class="audience-card fade-up">
-      <span class="audience-flag bark">Pure ROI</span>
-      <div class="audience-card-title">High-Volume Apps</div>
-      <p>Apps processing large image or text volumes pay real API costs. This is a quantifiable savings conversation — direct, measurable, defensible. Slower to convert but high-value accounts.</p>
-      <div class="audience-card-note">Direct sales motion. Longer cycle, bigger ACV.</div>
-    </div>
-    <div class="audience-card fade-up">
-      <span class="audience-flag terracotta">Enterprise</span>
-      <div class="audience-card-title">Enterprise App Teams</div>
-      <p>Shipping SLM-powered features and can't bet on open-source maintainability. Need SLAs, support, and certifications. SOC 2 Type II is a prerequisite for closing these deals.</p>
-      <div class="audience-card-note">Higher ACV. Longer sales cycle. Best Enterprise fit.</div>
-    </div>
-  </div>
-</section>
+  </section>
 
-<!-- PRICING -->
-<section class="pricing" id="pricing">
-  <div class="section-label">Monetization</div>
-  <h2 class="section-title">Free to run.<br>Paid to know.</h2>
-  <p class="section-body">The SDK is free. This removes all friction to adoption. We monetize the tooling and guarantees around it — not the runtime itself. The Sentry / Datadog / Segment model.</p>
-
-  <div class="pricing-grid">
-    <div class="price-card">
-      <div class="price-header">
-        <div class="price-tier">Free</div>
-        <div class="price-amount">$0</div>
-      </div>
-      <div class="price-body">
-        <p class="price-target">Developers evaluating and building.</p>
-        <ul class="price-features">
-          <li>SDK + runtime (full access)</li>
-          <li>Limited device matrix (5 profiles)</li>
-          <li>Community support</li>
-          <li>Hugging Face model integration</li>
-        </ul>
+  <section>
+    <div class="section-inner">
+      <div class="section-label">// Market</div>
+      <h2>Who we build for</h2>
+      <div class="segment-grid">
+        <div class="segment-item">
+          <span class="segment-tag">Day-One TAM</span>
+          <h3>Chinese iOS Developers</h3>
+          <p>Legally blocked from Western cloud APIs. The pitch is not cheaper — it is the only viable option. High urgency. Strong OCR and translation use cases.</p>
+        </div>
+        <div class="segment-item">
+          <span class="segment-tag">Simple Sale</span>
+          <h3>EU / GDPR Developers</h3>
+          <p>'Never leaves the device' eliminates their legal review entirely. Strong signal in German and Dutch indie dev communities. Privacy angle makes the sales conversation simple.</p>
+        </div>
+        <div class="segment-item">
+          <span class="segment-tag">Pure ROI</span>
+          <h3>High-Volume Apps</h3>
+          <p>Apps processing large image or text volumes pay real API costs. Pure cost elimination. Quantifiable savings. Direct sales motion.</p>
+        </div>
+        <div class="segment-item">
+          <span class="segment-tag">Higher ACV</span>
+          <h3>Enterprise App Teams</h3>
+          <p>Shipping SLM-powered features. Can't bet on open-source maintainability. Need SLAs and support. Longer sales cycle. Best fit for Enterprise tier.</p>
+        </div>
       </div>
     </div>
+  </section>
 
-    <div class="price-card featured">
-      <div class="price-header">
-        <div class="price-tier">Pro</div>
-        <div class="price-amount"><sub>from </sub>$49<sub>/mo</sub></div>
-      </div>
-      <div class="price-body">
-        <p class="price-target">Indie developers and small teams shipping real products.</p>
-        <ul class="price-features">
-          <li>Full device test matrix</li>
-          <li>Production telemetry dashboard</li>
-          <li>Chip split visibility per device</li>
-          <li>Latency percentile reports</li>
-          <li>Drift detection alerts</li>
-        </ul>
-      </div>
-    </div>
-
-    <div class="price-card">
-      <div class="price-header">
-        <div class="price-tier">Enterprise</div>
-        <div class="price-amount">Custom</div>
-      </div>
-      <div class="price-body">
-        <p class="price-target">Companies betting their product on on-device AI.</p>
-        <ul class="price-features">
-          <li>SLA guarantees</li>
-          <li>Day 1 hardware support</li>
-          <li>Private model hosting</li>
-          <li>Dedicated support channel</li>
-          <li>SOC 2 / HIPAA compliance docs</li>
-        </ul>
+  <section>
+    <div class="section-inner">
+      <div class="section-label">// Business model</div>
+      <h2>How we make money</h2>
+      <p>The SDK is free. We monetize the tooling and guarantees around it — not the runtime itself. Free instrumentation, paid insights and reliability. Sentry / Datadog / Segment model.</p>
+      <div class="tier-grid">
+        <div class="tier-item">
+          <h3>Free</h3>
+          <span class="tier-price">$0</span>
+          <p>SDK + runtime. Limited device matrix. Community support. Evaluating and building.</p>
+        </div>
+        <div class="tier-item">
+          <h3>Pro</h3>
+          <span class="tier-price">Monthly</span>
+          <p>Full device test matrix. Production telemetry. Chip split visibility. Latency reports.</p>
+        </div>
+        <div class="tier-item featured">
+          <h3>Enterprise</h3>
+          <span class="tier-price">Annual</span>
+          <p>SLA guarantees. Day 1 hardware support. Private model hosting. Dedicated support.</p>
+        </div>
+        <div class="tier-item">
+          <h3>Marketplace</h3>
+          <span class="tier-price">Rev Share</span>
+          <p>Platform cut on paid model listings. Model creators get distribution; we take a cut.</p>
+        </div>
       </div>
     </div>
+  </section>
 
-    <div class="price-card">
-      <div class="price-header">
-        <div class="price-tier">Marketplace</div>
-        <div class="price-amount">Rev<sub> share</sub></div>
+  <section>
+    <div class="section-inner">
+      <div class="section-label">// Execution</div>
+      <h2>Sequencing</h2>
+      <div class="phase-list">
+        <div class="phase-item">
+          <div class="phase-label"><small>Now</small>Phase 1</div>
+          <div class="phase-content">
+            <h3>Own the runtime layer</h3>
+            <p>Get into real codebases. Port first models in-house or via flat-fee contracts. No public announcement. No open marketplace yet.</p>
+          </div>
+        </div>
+        <div class="phase-item">
+          <div class="phase-label"><small>Near Term</small>Phase 2</div>
+          <div class="phase-content">
+            <h3>SDK soft launch</h3>
+            <p>SDK soft launch on GitHub. Tutorials go live. Engage dev communities as a resource, not a product. Become the default Cursor/Copilot suggestion. Documentation written for LLM consumption first, humans second.</p>
+          </div>
+        </div>
+        <div class="phase-item">
+          <div class="phase-label"><small>Public</small>Phase 3</div>
+          <div class="phase-content">
+            <h3>Public launch</h3>
+            <p>Launch once real usage exists. Lead with the technical story: we solve cross-device AI. Device testing platform goes live. Marketplace opens.</p>
+          </div>
+        </div>
+        <div class="phase-item">
+          <div class="phase-label"><small>Long Term</small>Moat</div>
+          <div class="phase-content">
+            <h3>Network effects</h3>
+            <p>When model companies hit the iOS/Android wall, we are already there. Marketplace fills with specialized models. Going direct becomes less attractive than listing on the platform everyone already uses. We think about this 100% of the time. Model companies think about device distribution 2% of the time. That gap only grows.</p>
+          </div>
+        </div>
       </div>
-      <div class="price-body">
-        <p class="price-target">Model creators who need cross-device distribution.</p>
-        <ul class="price-features">
-          <li>Platform % on paid model listings</li>
-          <li>Model creators get distribution</li>
-          <li>Curated + optimized model catalog</li>
-          <li>Fine-tuned / LoRA model sales</li>
-          <li>Grows with catalog depth</li>
-        </ul>
-      </div>
     </div>
-  </div>
-</section>
+  </section>
 
-<!-- ROADMAP -->
-<section class="roadmap" id="roadmap">
-  <div class="section-label" style="color: var(--sprout);">Roadmap</div>
-  <h2 class="section-title">Sequencing<br>matters.</h2>
-  <p class="section-body" style="color: rgba(240,247,230,0.6);">We don't announce until we exist. Distribution precedes the marketplace. Network effects reward patience.</p>
+</main>
 
-  <div class="timeline">
-    <div class="timeline-item">
-      <div class="timeline-phase">Phase 1 — Now</div>
-      <div class="timeline-title">Own the Runtime Layer</div>
-      <div class="timeline-body">Get into real codebases. Port first models in-house or via flat-fee contracts. No public announcement. No open marketplace yet. Build before broadcasting.</div>
-    </div>
-    <div class="timeline-item">
-      <div class="timeline-phase">Phase 2 — Near Term</div>
-      <div class="timeline-title">SDK Soft Launch</div>
-      <div class="timeline-body">SDK soft launch on GitHub. Tutorials go live in English and Chinese, structured to rank for iOS AI and Android AI. Engage dev communities as a resource, not a product. Seed the SDK into high-starred repos as a dependency. Become the default Cursor/Copilot suggestion.</div>
-    </div>
-    <div class="timeline-item future">
-      <div class="timeline-phase">Phase 3 — Public Launch</div>
-      <div class="timeline-title">Go Public With Real Usage</div>
-      <div class="timeline-body">Lead with the technical story. Device testing platform goes live. Marketplace opens. Documentation is written for LLM consumption first, humans second — so coding assistants suggest SMM by default.</div>
-    </div>
-    <div class="timeline-item future">
-      <div class="timeline-phase">Long Term</div>
-      <div class="timeline-title">Network Effects Compound</div>
-      <div class="timeline-body">When Cartesia and others hit the iOS/Android wall, we are already there. Marketplace fills with specialized models. Going direct becomes less attractive than listing on the platform everyone already uses.</div>
-    </div>
-  </div>
-</section>
-
-<!-- MODEL LANDSCAPE -->
-<section class="models" id="models">
-  <div class="section-label">Model Landscape</div>
-  <h2 class="section-title">Know your<br>size range.</h2>
-  <p class="section-body">From nano classifiers running on an A12 to medium-size agents on flagship silicon — every tier has a home on-device. Most marketplace models will live in the Small–Medium range.</p>
-
-  <div class="models-grid">
-    <div class="model-tier-card">
-      <div class="model-tier-name">Nano</div>
-      <div class="model-tier-range">50M – 500M</div>
-      <p>Any device (A12+, Android mid-range). Classifiers, keyword detection, OCR post-processing. Fastest inference, lowest battery draw.</p>
-    </div>
-    <div class="model-tier-card">
-      <div class="model-tier-name">Small</div>
-      <div class="model-tier-range">500M – 3B</div>
-      <p>A15+ / Android flagship. Light instruction following, NLU, translation, STT. 4-bit quant fits 1–2GB RAM. Sweet spot for most marketplace models.</p>
-    </div>
-    <div class="model-tier-card">
-      <div class="model-tier-name">Medium</div>
-      <div class="model-tier-range">3B – 13B</div>
-      <p>A16+ / high-end Android. Richer agents, code assist, nuanced generation. Thermal throttling is a real concern on sustained use.</p>
-    </div>
-    <div class="model-tier-card">
-      <div class="model-tier-name">Large</div>
-      <div class="model-tier-range">13B – 70B</div>
-      <p>M-series Mac / future devices. Complex reasoning, long-context tasks. Impractical for most iOS apps today — but tomorrow's horizon.</p>
-    </div>
-    <div class="model-tier-card">
-      <div class="model-tier-name">XL</div>
-      <div class="model-tier-range">70B+</div>
-      <p>Not on-device yet. Cloud only for now. Useful ceiling for understanding distillation targets and where the industry is heading.</p>
-    </div>
-  </div>
-</section>
-
-<!-- FOOTER -->
 <footer>
-  <div class="footer-grid">
-    <div>
-      <div class="footer-brand-name">Small Model Marketplace</div>
-      <p class="footer-brand-tagline">On-device AI infrastructure. Run any model, on any device, right now. We make models shippable — so you can focus on what they do.</p>
-    </div>
-    <div class="footer-col">
-      <div class="footer-col-title">Product</div>
-      <ul>
-        <li><a href="#">SDK Docs</a></li>
-        <li><a href="#">Device Testing</a></li>
-        <li><a href="#">Marketplace</a></li>
-        <li><a href="#">Changelog</a></li>
-      </ul>
-    </div>
-    <div class="footer-col">
-      <div class="footer-col-title">Resources</div>
-      <ul>
-        <li><a href="#">iOS Quickstart</a></li>
-        <li><a href="#">Android Quickstart</a></li>
-        <li><a href="#">llms.txt</a></li>
-        <li><a href="#">Model Submission</a></li>
-      </ul>
-    </div>
-    <div class="footer-col">
-      <div class="footer-col-title">Company</div>
-      <ul>
-        <li><a href="#">About</a></li>
-        <li><a href="#">Blog</a></li>
-        <li><a href="#">GitHub</a></li>
-        <li><a href="#">Contact</a></li>
-      </ul>
-    </div>
-  </div>
-  <div class="footer-bottom">
-    <p>© 2025 Small Model Marketplace. Infrastructure, not models.</p>
-    <p class="footer-manifesto">Steam, not CUDA.</p>
-  </div>
+  <div><strong>Small Model Marketplace</strong> &mdash; On-device AI infrastructure</div>
+  <div>We are infrastructure. Not models.</div>
 </footer>
 
-<script>
-  // CURSOR
-  const cursor = document.getElementById('cursor');
-  const ring = document.getElementById('cursor-ring');
-  let mx = 0, my = 0, rx = 0, ry = 0;
-
-  document.addEventListener('mousemove', (e) => {
-    mx = e.clientX; my = e.clientY;
-    cursor.style.left = mx + 'px';
-    cursor.style.top = my + 'px';
-  });
-
-  function animateRing() {
-    rx += (mx - rx) * 0.12;
-    ry += (my - ry) * 0.12;
-    ring.style.left = rx + 'px';
-    ring.style.top = ry + 'px';
-    requestAnimationFrame(animateRing);
-  }
-  animateRing();
-
-  document.querySelectorAll('a, button, .problem-card, .audience-card, .price-card, .model-tier-card').forEach(el => {
-    el.addEventListener('mouseenter', () => {
-      cursor.style.transform = 'translate(-50%, -50%) scale(2.5)';
-      cursor.style.background = 'var(--amber)';
-      ring.style.opacity = '0.3';
-    });
-    el.addEventListener('mouseleave', () => {
-      cursor.style.transform = 'translate(-50%, -50%) scale(1)';
-      cursor.style.background = 'var(--leaf)';
-      ring.style.opacity = '0.6';
-    });
-  });
-
-  // SCROLL FADE-UP
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach(e => {
-      if (e.isIntersecting) {
-        e.target.classList.add('visible');
-      }
-    });
-  }, { threshold: 0.15 });
-
-  document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
-</script>
 </body>
 </html>
