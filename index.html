@@ -6,48 +6,70 @@
 <title>Small Model Marketplace — On-Device AI Infrastructure</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
-
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=Lora:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #0b1a0c;
-    --bg2: #101f11;
-    --surface: #162616;
-    --border: rgba(140, 198, 63, 0.15);
-    --accent: #8cc63f;
-    --accent2: #f0b429;
-    --accent-dim: rgba(140, 198, 63, 0.18);
-    --text: #e2edda;
-    --muted: #7a9469;
-    --danger: #e05c2e;
-    --mono: 'Space Mono', monospace;
-    --display: 'Syne', sans-serif;
+    --moss: #2d4a22;
+    --canopy: #3d6b2e;
+    --leaf: #5a9140;
+    --sprout: #8cbf5e;
+    --lichen: #c5dfa8;
+    --petal: #f0f7e6;
+    --amber: #c97c2a;
+    --gold: #e8a93c;
+    --honey: #f5cc7a;
+    --cream: #faf6ee;
+    --bark: #7a5533;
+    --earth: #a67c52;
+    --terracotta: #c26b42;
+    --night: #0f1f0a;
+    --dusk: #1a3012;
   }
 
-  * { margin: 0; padding: 0; box-sizing: border-box; }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
   html { scroll-behavior: smooth; }
 
   body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: var(--mono);
-    font-size: 14px;
-    line-height: 1.7;
+    background-color: var(--cream);
+    color: var(--moss);
+    font-family: 'Lora', Georgia, serif;
     overflow-x: hidden;
+    cursor: none;
   }
 
-  /* Grid overlay */
+  /* CUSTOM CURSOR */
+  .cursor {
+    position: fixed;
+    width: 12px; height: 12px;
+    background: var(--leaf);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9999;
+    transition: transform 0.15s ease, background 0.2s;
+    transform: translate(-50%, -50%);
+  }
+  .cursor-ring {
+    position: fixed;
+    width: 36px; height: 36px;
+    border: 1.5px solid var(--leaf);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9998;
+    transition: transform 0.35s cubic-bezier(.23,1,.32,1), opacity 0.2s;
+    transform: translate(-50%, -50%);
+    opacity: 0.6;
+  }
+
+  /* NOISE OVERLAY */
   body::before {
     content: '';
     position: fixed;
     inset: 0;
-    background-image:
-      linear-gradient(rgba(140,198,63,0.03) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(140,198,63,0.03) 1px, transparent 1px);
-    background-size: 60px 60px;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
     pointer-events: none;
-    z-index: 0;
+    z-index: 1000;
+    opacity: 0.35;
   }
 
   /* NAV */
@@ -56,1204 +78,1476 @@
     top: 0; left: 0; right: 0;
     z-index: 100;
     display: flex;
-    align-items: center;
     justify-content: space-between;
-    padding: 18px 40px;
-    background: rgba(11, 26, 12, 0.88);
+    align-items: center;
+    padding: 1.25rem 3rem;
+    background: rgba(250,246,238,0.88);
     backdrop-filter: blur(12px);
-    border-bottom: 1px solid var(--border);
+    border-bottom: 1px solid rgba(90,145,64,0.15);
   }
 
   .nav-logo {
-    font-family: var(--display);
-    font-weight: 800;
-    font-size: 15px;
-    letter-spacing: 0.05em;
-    color: var(--accent);
-    text-transform: uppercase;
+    font-family: 'Playfair Display', serif;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--moss);
+    letter-spacing: 0.02em;
+    display: flex; align-items: center; gap: 0.6rem;
   }
-
-  .nav-logo span {
-    color: var(--text);
-    opacity: 0.5;
+  .nav-logo .leaf-icon {
+    width: 22px; height: 22px;
+    background: var(--leaf);
+    clip-path: polygon(50% 0%, 85% 15%, 100% 50%, 85% 85%, 50% 100%, 15% 85%, 0% 50%, 15% 15%);
+    display: inline-block;
+    position: relative;
+    animation: spin-slow 12s linear infinite;
   }
+  @keyframes spin-slow { to { transform: rotate(360deg); } }
 
-  .nav-links {
-    display: flex;
-    gap: 32px;
-    list-style: none;
-  }
-
-  .nav-links a {
-    color: var(--muted);
+  nav ul { list-style: none; display: flex; gap: 2.5rem; }
+  nav ul a {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.72rem;
+    color: var(--canopy);
     text-decoration: none;
-    font-size: 11px;
     letter-spacing: 0.12em;
     text-transform: uppercase;
     transition: color 0.2s;
   }
+  nav ul a:hover { color: var(--amber); }
 
-  .nav-links a:hover { color: var(--accent); }
-
-  /* SECTIONS */
-  section {
-    position: relative;
-    z-index: 1;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    padding: 120px 40px 80px;
-    max-width: 1200px;
-    margin: 0 auto;
+  .nav-cta {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    background: var(--moss);
+    color: var(--petal);
+    border: none;
+    padding: 0.6rem 1.4rem;
+    border-radius: 2px;
+    cursor: none;
+    transition: background 0.2s, transform 0.15s;
   }
-
-  section.full-width {
-    max-width: 100%;
-    padding: 120px 80px 80px;
-  }
+  .nav-cta:hover { background: var(--canopy); transform: translateY(-1px); }
 
   /* HERO */
   .hero {
     min-height: 100vh;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero-left {
+    display: flex;
+    flex-direction: column;
     justify-content: center;
-    padding-top: 140px;
+    padding: 8rem 4rem 6rem 6rem;
+    position: relative;
+    z-index: 2;
   }
 
   .hero-eyebrow {
-    font-size: 11px;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem;
     letter-spacing: 0.2em;
     text-transform: uppercase;
-    color: var(--accent);
-    margin-bottom: 28px;
-    display: flex;
-    align-items: center;
-    gap: 12px;
+    color: var(--leaf);
+    margin-bottom: 1.5rem;
+    display: flex; align-items: center; gap: 0.75rem;
   }
-
   .hero-eyebrow::before {
     content: '';
-    display: block;
-    width: 40px;
-    height: 1px;
-    background: var(--accent);
+    display: inline-block;
+    width: 32px; height: 1px;
+    background: var(--leaf);
   }
 
   .hero-title {
-    font-family: var(--display);
-    font-size: clamp(52px, 7vw, 96px);
-    font-weight: 800;
-    line-height: 0.95;
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(3.2rem, 5vw, 5.5rem);
+    font-weight: 900;
+    line-height: 1.0;
+    color: var(--night);
+    margin-bottom: 2rem;
     letter-spacing: -0.02em;
-    margin-bottom: 36px;
-    max-width: 800px;
   }
-
   .hero-title em {
-    font-style: normal;
-    color: var(--accent);
+    font-style: italic;
+    color: var(--canopy);
+  }
+  .hero-title .accent-word {
+    position: relative;
+    display: inline-block;
+  }
+  .hero-title .accent-word::after {
+    content: '';
+    position: absolute;
+    bottom: 4px; left: 0; right: 0;
+    height: 6px;
+    background: var(--honey);
+    z-index: -1;
+    opacity: 0.7;
   }
 
   .hero-sub {
-    font-size: 16px;
-    color: var(--muted);
-    max-width: 480px;
-    line-height: 1.8;
-    margin-bottom: 56px;
+    font-family: 'Lora', serif;
+    font-size: 1.05rem;
+    line-height: 1.7;
+    color: var(--bark);
+    max-width: 440px;
+    margin-bottom: 3rem;
+    font-style: italic;
   }
 
-  .hero-cta {
-    display: flex;
-    gap: 16px;
-    flex-wrap: wrap;
-  }
-
-  .btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 14px 28px;
-    font-family: var(--mono);
-    font-size: 12px;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    text-decoration: none;
-    border: none;
-    cursor: pointer;
-    transition: all 0.2s;
-  }
+  .hero-actions { display: flex; gap: 1rem; align-items: center; }
 
   .btn-primary {
-    background: var(--accent);
-    color: var(--bg);
-    font-weight: 700;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.75rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    background: var(--leaf);
+    color: white;
+    border: none;
+    padding: 0.9rem 2rem;
+    border-radius: 2px;
+    cursor: none;
+    transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
   }
-
   .btn-primary:hover {
-    background: #a8db54;
-    transform: translateY(-1px);
+    background: var(--canopy);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(45,74,34,0.25);
   }
 
   .btn-ghost {
-    background: transparent;
-    color: var(--text);
-    border: 1px solid var(--border);
-  }
-
-  .btn-ghost:hover {
-    border-color: var(--accent);
-    color: var(--accent);
-  }
-
-  /* Hero stat bar */
-  .hero-stats {
-    display: flex;
-    gap: 48px;
-    margin-top: 80px;
-    padding-top: 40px;
-    border-top: 1px solid var(--border);
-    flex-wrap: wrap;
-  }
-
-  .stat-item { display: flex; flex-direction: column; gap: 4px; }
-
-  .stat-num {
-    font-family: var(--display);
-    font-size: 28px;
-    font-weight: 800;
-    color: var(--accent);
-  }
-
-  .stat-label {
-    font-size: 11px;
-    color: var(--muted);
+    font-family: 'DM Mono', monospace;
+    font-size: 0.75rem;
     letter-spacing: 0.1em;
     text-transform: uppercase;
+    background: transparent;
+    color: var(--moss);
+    border: 1px solid var(--lichen);
+    padding: 0.9rem 2rem;
+    border-radius: 2px;
+    cursor: none;
+    transition: border-color 0.2s, color 0.2s;
+  }
+  .btn-ghost:hover { border-color: var(--leaf); color: var(--leaf); }
+
+  .hero-right {
+    position: relative;
+    overflow: hidden;
+    background: var(--dusk);
   }
 
-  /* SECTION LABELS */
-  .section-label {
-    font-size: 11px;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    color: var(--accent);
-    margin-bottom: 48px;
+  /* SVG BOTANICAL ILLUSTRATION */
+  .hero-botanical {
+    position: absolute;
+    inset: 0;
     display: flex;
     align-items: center;
-    gap: 16px;
+    justify-content: center;
   }
 
-  .section-label::after {
+  .botanical-svg {
+    width: 90%;
+    height: 90%;
+    opacity: 0.85;
+  }
+
+  .floating-stat {
+    position: absolute;
+    background: rgba(250,246,238,0.1);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(140,191,94,0.3);
+    border-radius: 4px;
+    padding: 1rem 1.5rem;
+    color: var(--lichen);
+    font-family: 'DM Mono', monospace;
+  }
+  .floating-stat .stat-num {
+    font-size: 1.8rem;
+    font-weight: 500;
+    color: var(--honey);
+    display: block;
+  }
+  .floating-stat .stat-label {
+    font-size: 0.65rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--sprout);
+  }
+  .floating-stat:nth-child(1) { top: 20%; left: 10%; animation: float 6s ease-in-out infinite; }
+  .floating-stat:nth-child(2) { bottom: 28%; right: 8%; animation: float 7s ease-in-out infinite 1s; }
+  .floating-stat:nth-child(3) { top: 55%; left: 15%; animation: float 5.5s ease-in-out infinite 2s; }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+  }
+
+  /* SCROLL INDICATOR */
+  .scroll-hint {
+    position: absolute;
+    bottom: 2.5rem;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--leaf);
+    z-index: 5;
+  }
+  .scroll-hint .arrow {
+    width: 1px;
+    height: 40px;
+    background: linear-gradient(to bottom, var(--leaf), transparent);
+    animation: scroll-line 1.8s ease-in-out infinite;
+  }
+  @keyframes scroll-line {
+    0% { transform: scaleY(0); transform-origin: top; opacity: 0; }
+    50% { transform: scaleY(1); transform-origin: top; opacity: 1; }
+    100% { transform: scaleY(1); transform-origin: bottom; opacity: 0; }
+  }
+
+  /* TAGLINE BAND */
+  .tagline-band {
+    background: var(--moss);
+    color: var(--lichen);
+    padding: 1.25rem 0;
+    overflow: hidden;
+    position: relative;
+  }
+  .tagline-track {
+    display: flex;
+    white-space: nowrap;
+    animation: marquee 30s linear infinite;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    gap: 4rem;
+  }
+  .tagline-track span { color: var(--gold); }
+  @keyframes marquee {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
+
+  /* SECTIONS */
+  section { padding: 7rem 6rem; }
+
+  .section-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.68rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--leaf);
+    margin-bottom: 1rem;
+    display: flex; align-items: center; gap: 0.75rem;
+  }
+  .section-label::before {
     content: '';
-    flex: 1;
-    height: 1px;
-    background: var(--border);
-    max-width: 200px;
+    width: 24px; height: 1px;
+    background: var(--leaf);
+    display: inline-block;
   }
 
   .section-title {
-    font-family: var(--display);
-    font-size: clamp(32px, 4vw, 52px);
-    font-weight: 800;
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2.2rem, 3.5vw, 3.5rem);
+    font-weight: 900;
     line-height: 1.1;
+    color: var(--night);
+    margin-bottom: 1.5rem;
     letter-spacing: -0.02em;
-    margin-bottom: 24px;
   }
 
   .section-body {
-    color: var(--muted);
-    max-width: 580px;
-    font-size: 14px;
-    line-height: 1.9;
-    margin-bottom: 60px;
+    font-family: 'Lora', serif;
+    font-size: 1rem;
+    line-height: 1.75;
+    color: var(--bark);
+    max-width: 600px;
   }
 
-  /* PROBLEM CARDS */
-  .problems-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 1px;
-    background: var(--border);
-    border: 1px solid var(--border);
-    margin-top: 60px;
-  }
-
-  .problem-card {
-    background: var(--bg2);
-    padding: 36px 32px;
+  /* PROBLEM SECTION */
+  .problem {
+    background: var(--petal);
     position: relative;
-    transition: background 0.3s;
+    overflow: hidden;
   }
-
-  .problem-card:hover { background: var(--surface); }
-
-  .problem-card::before {
-    content: attr(data-num);
-    position: absolute;
-    top: 24px;
-    right: 28px;
-    font-family: var(--display);
-    font-size: 48px;
-    font-weight: 800;
-    color: var(--border);
-    line-height: 1;
-  }
-
-  .problem-tag {
-    display: inline-block;
-    background: var(--accent-dim);
-    color: var(--accent);
-    font-size: 10px;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    padding: 4px 10px;
-    margin-bottom: 20px;
-  }
-
-  .problem-title {
-    font-family: var(--display);
-    font-size: 20px;
-    font-weight: 700;
-    margin-bottom: 14px;
-    line-height: 1.2;
-  }
-
-  .problem-desc {
-    color: var(--muted);
-    font-size: 13px;
-    line-height: 1.8;
-  }
-
-  /* WHAT WE BUILD */
-  .build-layout {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 80px;
-    align-items: center;
-  }
-
-  @media (max-width: 900px) {
-    .build-layout { grid-template-columns: 1fr; }
-  }
-
-  .pipeline {
-    display: flex;
-    flex-direction: column;
-    gap: 0;
-  }
-
-  .pipeline-step {
-    display: flex;
-    gap: 20px;
-    padding: 24px 0;
-    border-bottom: 1px solid var(--border);
-    position: relative;
-  }
-
-  .pipeline-step:last-child { border-bottom: none; }
-
-  .step-icon {
-    width: 36px;
-    height: 36px;
-    min-width: 36px;
-    border: 1px solid var(--accent);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 11px;
-    color: var(--accent);
-    font-weight: 700;
-    margin-top: 2px;
-  }
-
-  .step-label {
-    font-size: 11px;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--accent);
-    margin-bottom: 4px;
-  }
-
-  .step-title {
-    font-family: var(--display);
-    font-size: 17px;
-    font-weight: 700;
-    margin-bottom: 6px;
-  }
-
-  .step-desc { color: var(--muted); font-size: 13px; }
-
-  /* TERMINAL BLOCK */
-  .terminal {
-    background: #080f08;
-    border: 1px solid var(--border);
-    padding: 0;
-    font-size: 13px;
-    position: relative;
-  }
-
-  .terminal-bar {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 12px 16px;
-    border-bottom: 1px solid var(--border);
-    background: var(--surface);
-  }
-
-  .term-dot {
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-  }
-
-  .term-dot:nth-child(1) { background: #ff5f57; }
-  .term-dot:nth-child(2) { background: #ffbd2e; }
-  .term-dot:nth-child(3) { background: #28c840; }
-
-  .term-label {
-    margin-left: 8px;
-    font-size: 11px;
-    color: var(--muted);
-    letter-spacing: 0.08em;
-  }
-
-  .terminal-body {
-    padding: 24px 20px;
-    line-height: 2;
-  }
-
-  .term-comment { color: #3a5a2a; }
-  .term-cmd { color: var(--accent2); }
-  .term-out { color: var(--muted); }
-  .term-success { color: var(--accent); }
-  .term-key { color: var(--accent2); }
-  .term-val { color: var(--accent); }
-  .term-dim { color: #2d3d2d; }
-
-  /* COMPETITIVE TABLE */
-  .comp-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 13px;
-    margin-top: 40px;
-  }
-
-  .comp-table th {
-    text-align: left;
-    padding: 14px 20px;
-    font-size: 10px;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    color: var(--muted);
-    border-bottom: 1px solid var(--border);
-    font-weight: 400;
-  }
-
-  .comp-table td {
-    padding: 18px 20px;
-    border-bottom: 1px solid rgba(140,198,63,0.08);
-    vertical-align: top;
-    line-height: 1.7;
-    color: var(--muted);
-  }
-
-  .comp-table td:first-child {
-    color: var(--text);
-    font-weight: 700;
-    white-space: nowrap;
-  }
-
-  .comp-table tr:last-child td {
-    color: var(--text);
-    background: rgba(140, 198, 63, 0.07);
-  }
-
-  .comp-table tr:last-child td:first-child {
-    color: var(--accent);
-  }
-
-  .comp-table tr:last-child {
-    border: 1px solid var(--border);
-  }
-
-  .badge {
-    display: inline-block;
-    padding: 2px 8px;
-    font-size: 10px;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    margin-left: 6px;
-  }
-
-  .badge-good { background: rgba(140,198,63,0.18); color: var(--accent); }
-  .badge-bad { background: rgba(224,92,46,0.15); color: var(--danger); }
-
-  /* SEGMENTS GRID */
-  .segments-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-    gap: 1px;
-    background: var(--border);
-    border: 1px solid var(--border);
-  }
-
-  .segment-card {
-    background: var(--bg2);
-    padding: 32px 28px;
-    transition: background 0.2s;
-  }
-
-  .segment-card:hover { background: var(--surface); }
-
-  .segment-flag {
-    font-size: 10px;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    color: var(--accent);
-    margin-bottom: 16px;
-    padding: 3px 10px;
-    border: 1px solid var(--accent-dim);
-    display: inline-block;
-  }
-
-  .segment-title {
-    font-family: var(--display);
-    font-size: 18px;
-    font-weight: 700;
-    margin-bottom: 12px;
-  }
-
-  .segment-desc { color: var(--muted); font-size: 13px; line-height: 1.8; }
-
-  /* PRICING */
-  .pricing-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-    gap: 1px;
-    background: var(--border);
-    border: 1px solid var(--border);
-    margin-top: 60px;
-  }
-
-  .price-card {
-    background: var(--bg2);
-    padding: 40px 32px;
-    position: relative;
-    transition: background 0.2s;
-  }
-
-  .price-card.featured {
-    background: rgba(140, 198, 63, 0.06);
-  }
-
-  .price-card:hover { background: var(--surface); }
-
-  .price-tier {
-    font-size: 11px;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    color: var(--accent);
-    margin-bottom: 20px;
-  }
-
-  .price-amount {
-    font-family: var(--display);
-    font-size: 40px;
-    font-weight: 800;
-    margin-bottom: 8px;
-    line-height: 1;
-  }
-
-  .price-period { font-size: 13px; color: var(--muted); margin-bottom: 28px; }
-
-  .price-features { list-style: none; display: flex; flex-direction: column; gap: 10px; }
-
-  .price-features li {
-    font-size: 13px;
-    color: var(--muted);
-    display: flex;
-    align-items: flex-start;
-    gap: 10px;
-  }
-
-  .price-features li::before {
-    content: '→';
-    color: var(--accent);
-    flex-shrink: 0;
-  }
-
-  /* ROADMAP */
-  .roadmap {
-    display: flex;
-    flex-direction: column;
-    gap: 0;
-    position: relative;
-    margin-top: 60px;
-  }
-
-  .roadmap::before {
+  .problem::before {
     content: '';
     position: absolute;
-    left: 17px;
-    top: 0;
-    bottom: 0;
-    width: 1px;
-    background: var(--border);
-  }
-
-  .roadmap-item {
-    display: flex;
-    gap: 32px;
-    padding-bottom: 48px;
-    position: relative;
-  }
-
-  .roadmap-dot {
-    width: 36px;
-    height: 36px;
-    min-width: 36px;
-    border: 1px solid var(--accent);
-    background: var(--bg);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 10px;
-    color: var(--accent);
-    font-weight: 700;
-    z-index: 1;
-    flex-shrink: 0;
-  }
-
-  .roadmap-dot.active {
-    background: var(--accent);
-    color: var(--bg);
-  }
-
-  .roadmap-content { padding-top: 6px; }
-
-  .roadmap-phase {
-    font-size: 10px;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
-    color: var(--accent);
-    margin-bottom: 6px;
-  }
-
-  .roadmap-title {
-    font-family: var(--display);
-    font-size: 20px;
-    font-weight: 700;
-    margin-bottom: 8px;
-  }
-
-  .roadmap-desc { color: var(--muted); font-size: 13px; max-width: 500px; line-height: 1.8; }
-
-  /* FOOTER / CTA SECTION */
-  .cta-section {
-    min-height: 60vh;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
-    position: relative;
-    z-index: 1;
-    padding: 120px 40px;
-  }
-
-  .cta-section::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: radial-gradient(ellipse 60% 60% at 50% 50%, rgba(240, 180, 41, 0.07) 0%, transparent 70%);
+    top: -100px; right: -100px;
+    width: 500px; height: 500px;
+    background: radial-gradient(circle, rgba(140,191,94,0.12) 0%, transparent 70%);
     pointer-events: none;
   }
 
-  .cta-title {
-    font-family: var(--display);
-    font-size: clamp(40px, 6vw, 80px);
-    font-weight: 800;
-    line-height: 1;
-    letter-spacing: -0.02em;
-    margin-bottom: 24px;
+  .problem-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6rem;
+    margin-top: 5rem;
   }
 
-  .cta-sub {
-    color: var(--muted);
-    font-size: 14px;
-    max-width: 480px;
-    margin: 0 auto 48px;
-    line-height: 1.8;
-  }
-
-  footer {
+  .problem-card {
     position: relative;
-    z-index: 1;
-    border-top: 1px solid var(--border);
-    padding: 32px 80px;
+    padding: 2.5rem;
+    border: 1px solid var(--lichen);
+    border-radius: 4px;
+    background: white;
+    transition: transform 0.3s, box-shadow 0.3s;
+    overflow: hidden;
+  }
+  .problem-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 3px;
+    height: 100%;
+    background: linear-gradient(to bottom, var(--leaf), var(--amber));
+  }
+  .problem-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 20px 40px rgba(45,74,34,0.1);
+  }
+
+  .problem-card-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 4rem;
+    font-weight: 900;
+    color: var(--lichen);
+    line-height: 1;
+    margin-bottom: 1rem;
+  }
+  .problem-card-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--moss);
+    margin-bottom: 0.75rem;
+  }
+  .problem-card p {
+    font-size: 0.9rem;
+    line-height: 1.7;
+    color: var(--bark);
+  }
+  .problem-card-tag {
+    display: inline-block;
+    margin-top: 1rem;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.62rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--leaf);
+    background: var(--petal);
+    border: 1px solid var(--lichen);
+    padding: 0.3rem 0.7rem;
+    border-radius: 2px;
+  }
+
+  /* WHAT WE BUILD */
+  .product {
+    background: var(--night);
+    color: var(--petal);
+    position: relative;
+    overflow: hidden;
+  }
+  .product::after {
+    content: '';
+    position: absolute;
+    bottom: -200px; right: -200px;
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, rgba(90,145,64,0.08) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .product .section-title { color: var(--petal); }
+  .product .section-body { color: rgba(240,247,230,0.65); }
+
+  .pipeline-visual {
+    margin-top: 4rem;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: rgba(140,191,94,0.15);
+    border: 1px solid rgba(140,191,94,0.15);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+
+  .pipeline-step {
+    background: var(--dusk);
+    padding: 2.5rem 2rem;
+    position: relative;
+    transition: background 0.3s;
+  }
+  .pipeline-step:hover { background: rgba(26,48,18,0.9); }
+
+  .pipeline-step-phase {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.62rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--sprout);
+    margin-bottom: 1rem;
+  }
+  .pipeline-step-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--honey);
+    margin-bottom: 1rem;
+    line-height: 1.2;
+  }
+  .pipeline-step ul {
+    list-style: none;
+  }
+  .pipeline-step ul li {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.75rem;
+    line-height: 1.6;
+    color: var(--lichen);
+    padding-left: 1rem;
+    position: relative;
+    margin-bottom: 0.5rem;
+  }
+  .pipeline-step ul li::before {
+    content: '→';
+    position: absolute;
+    left: 0;
+    color: var(--leaf);
+  }
+
+  /* COMPETITIVE TABLE */
+  .competitive {
+    background: var(--petal);
+    position: relative;
+  }
+
+  .comp-intro {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6rem;
+    align-items: start;
+    margin-bottom: 5rem;
+  }
+
+  .comp-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.8rem;
+    margin-top: 2rem;
+  }
+  .comp-table thead th {
+    font-size: 0.65rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--leaf);
+    border-bottom: 1px solid var(--lichen);
+    padding: 0.75rem 1.25rem;
+    text-align: left;
+  }
+  .comp-table tbody tr {
+    border-bottom: 1px solid rgba(197,223,168,0.4);
+    transition: background 0.2s;
+  }
+  .comp-table tbody tr:hover { background: rgba(197,223,168,0.12); }
+  .comp-table tbody td {
+    padding: 1.25rem;
+    vertical-align: top;
+    color: var(--bark);
+    line-height: 1.5;
+    font-size: 0.78rem;
+  }
+  .comp-table tbody td:first-child {
+    font-weight: 500;
+    color: var(--moss);
+  }
+  .comp-table tr.highlight-row td {
+    background: rgba(90,145,64,0.08);
+    color: var(--moss);
+  }
+  .comp-table tr.highlight-row td:first-child {
+    color: var(--canopy);
+    font-weight: 700;
+  }
+  .badge {
+    display: inline-block;
+    font-size: 0.6rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 0.15rem 0.5rem;
+    border-radius: 2px;
+  }
+  .badge-green { background: var(--lichen); color: var(--moss); }
+  .badge-amber { background: var(--honey); color: var(--bark); }
+
+  /* WHO WE SERVE */
+  .audience {
+    background: white;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .audience::before {
+    content: '';
+    position: absolute;
+    top: 0; right: 0; bottom: 0;
+    width: 40%;
+    background: linear-gradient(135deg, var(--petal) 0%, var(--lichen) 100%);
+    opacity: 0.4;
+    clip-path: polygon(20% 0%, 100% 0%, 100% 100%, 0% 100%);
+  }
+
+  .audience-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    margin-top: 4rem;
+  }
+
+  .audience-card {
+    padding: 2.5rem;
+    border: 1px solid var(--lichen);
+    border-radius: 4px;
+    background: white;
+    position: relative;
+    transition: transform 0.3s, box-shadow 0.3s;
+  }
+  .audience-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 32px rgba(45,74,34,0.08);
+  }
+
+  .audience-flag {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.62rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: white;
+    background: var(--leaf);
+    padding: 0.3rem 0.7rem;
+    border-radius: 2px;
+    display: inline-block;
+    margin-bottom: 1.25rem;
+  }
+  .audience-flag.amber { background: var(--amber); }
+  .audience-flag.bark { background: var(--bark); }
+  .audience-flag.terracotta { background: var(--terracotta); }
+
+  .audience-card-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--moss);
+    margin-bottom: 0.75rem;
+  }
+  .audience-card p {
+    font-size: 0.9rem;
+    line-height: 1.7;
+    color: var(--bark);
+  }
+  .audience-card-note {
+    margin-top: 1rem;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--leaf);
+    font-style: italic;
+  }
+
+  /* PRICING */
+  .pricing {
+    background: var(--cream);
+    position: relative;
+  }
+
+  .pricing-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.5rem;
+    margin-top: 4rem;
+  }
+
+  .price-card {
+    border: 1px solid var(--lichen);
+    border-radius: 4px;
+    overflow: hidden;
+    background: white;
+    transition: transform 0.3s, box-shadow 0.3s;
+    display: flex;
+    flex-direction: column;
+  }
+  .price-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 16px 36px rgba(45,74,34,0.1);
+  }
+  .price-card.featured {
+    border-color: var(--leaf);
+    box-shadow: 0 0 0 2px rgba(90,145,64,0.15);
+  }
+
+  .price-header {
+    padding: 2rem;
+    background: var(--petal);
+    border-bottom: 1px solid var(--lichen);
+  }
+  .price-card.featured .price-header {
+    background: var(--canopy);
+  }
+
+  .price-tier {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--leaf);
+    margin-bottom: 0.75rem;
+  }
+  .price-card.featured .price-tier { color: var(--sprout); }
+
+  .price-amount {
+    font-family: 'Playfair Display', serif;
+    font-size: 2rem;
+    font-weight: 900;
+    color: var(--moss);
+    line-height: 1;
+  }
+  .price-card.featured .price-amount { color: var(--honey); }
+  .price-amount sub {
+    font-size: 1rem;
+    font-weight: 400;
+    vertical-align: baseline;
+    color: var(--earth);
+  }
+  .price-card.featured .price-amount sub { color: var(--sprout); }
+
+  .price-body {
+    padding: 2rem;
+    flex: 1;
+  }
+  .price-target {
+    font-family: 'Lora', serif;
+    font-size: 0.85rem;
+    font-style: italic;
+    color: var(--earth);
+    margin-bottom: 1.5rem;
+    line-height: 1.5;
+  }
+  .price-features { list-style: none; }
+  .price-features li {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.72rem;
+    color: var(--bark);
+    padding: 0.4rem 0;
+    border-bottom: 1px solid rgba(197,223,168,0.3);
+    display: flex; gap: 0.5rem;
+  }
+  .price-features li::before { content: '✓'; color: var(--leaf); flex-shrink: 0; }
+
+  /* ROADMAP */
+  .roadmap {
+    background: var(--night);
+    color: var(--petal);
+    position: relative;
+    overflow: hidden;
+  }
+  .roadmap .section-title { color: var(--petal); }
+
+  .timeline {
+    margin-top: 4rem;
+    position: relative;
+    padding-left: 3rem;
+  }
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 0.75rem; top: 0; bottom: 0;
+    width: 1px;
+    background: linear-gradient(to bottom, var(--leaf), transparent);
+  }
+
+  .timeline-item {
+    position: relative;
+    margin-bottom: 3.5rem;
+    padding-left: 2rem;
+  }
+  .timeline-item::before {
+    content: '';
+    position: absolute;
+    left: -2.375rem;
+    top: 0.35rem;
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    background: var(--leaf);
+    box-shadow: 0 0 0 3px rgba(90,145,64,0.2);
+  }
+  .timeline-item.future::before { background: var(--amber); box-shadow: 0 0 0 3px rgba(201,124,42,0.2); }
+
+  .timeline-phase {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--sprout);
+    margin-bottom: 0.5rem;
+  }
+  .timeline-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--honey);
+    margin-bottom: 0.75rem;
+  }
+  .timeline-body {
+    font-size: 0.9rem;
+    line-height: 1.7;
+    color: rgba(240,247,230,0.6);
+    max-width: 600px;
+  }
+
+  /* MODEL LANDSCAPE */
+  .models {
+    background: var(--petal);
+    overflow: hidden;
+  }
+
+  .models-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 1rem;
+    margin-top: 4rem;
+  }
+
+  .model-tier-card {
+    padding: 1.5rem;
+    border-radius: 4px;
+    border: 1px solid;
+    transition: transform 0.2s;
+  }
+  .model-tier-card:hover { transform: translateY(-3px); }
+
+  .model-tier-card:nth-child(1) { border-color: var(--sprout); background: rgba(140,191,94,0.1); }
+  .model-tier-card:nth-child(2) { border-color: var(--leaf); background: rgba(90,145,64,0.1); }
+  .model-tier-card:nth-child(3) { border-color: var(--canopy); background: rgba(61,107,46,0.1); }
+  .model-tier-card:nth-child(4) { border-color: var(--amber); background: rgba(201,124,42,0.08); }
+  .model-tier-card:nth-child(5) { border-color: var(--terracotta); background: rgba(194,107,66,0.08); }
+
+  .model-tier-name {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--leaf);
+    margin-bottom: 0.5rem;
+  }
+  .model-tier-range {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--moss);
+    margin-bottom: 0.75rem;
+  }
+  .model-tier-card p {
+    font-size: 0.78rem;
+    line-height: 1.6;
+    color: var(--bark);
+  }
+
+  /* FOOTER */
+  footer {
+    background: var(--night);
+    padding: 5rem 6rem 3rem;
+    position: relative;
+    overflow: hidden;
+  }
+  footer::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(to right, transparent, var(--leaf), transparent);
+  }
+
+  .footer-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr;
+    gap: 4rem;
+    margin-bottom: 4rem;
+  }
+
+  .footer-brand-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.5rem;
+    font-weight: 900;
+    color: var(--petal);
+    margin-bottom: 0.75rem;
+  }
+  .footer-brand-tagline {
+    font-family: 'Lora', serif;
+    font-style: italic;
+    font-size: 0.9rem;
+    color: rgba(240,247,230,0.45);
+    line-height: 1.6;
+  }
+
+  .footer-col-title {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--sprout);
+    margin-bottom: 1.25rem;
+  }
+  .footer-col ul { list-style: none; }
+  .footer-col ul li {
+    margin-bottom: 0.6rem;
+  }
+  .footer-col ul a {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.78rem;
+    color: rgba(240,247,230,0.45);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  .footer-col ul a:hover { color: var(--sprout); }
+
+  .footer-bottom {
+    border-top: 1px solid rgba(140,191,94,0.1);
+    padding-top: 2rem;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    font-size: 11px;
-    color: var(--muted);
+  }
+  .footer-bottom p {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.68rem;
+    color: rgba(240,247,230,0.3);
     letter-spacing: 0.08em;
   }
-
-  /* ANIMATIONS */
-  @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(30px); }
-    to { opacity: 1; transform: translateY(0); }
+  .footer-manifesto {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: 0.85rem;
+    color: rgba(240,247,230,0.35);
   }
 
-  @keyframes blink {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0; }
+  /* DECORATIVE VINES */
+  .vine-deco {
+    position: absolute;
+    pointer-events: none;
+    opacity: 0.08;
   }
 
-  .cursor {
-    display: inline-block;
-    width: 8px;
-    height: 15px;
-    background: var(--accent);
-    vertical-align: middle;
-    animation: blink 1s step-end infinite;
-    margin-left: 2px;
-  }
-
-  .animate {
-    opacity: 0;
-    animation: fadeUp 0.7s ease forwards;
-  }
-
-  .animate-delay-1 { animation-delay: 0.1s; }
-  .animate-delay-2 { animation-delay: 0.25s; }
-  .animate-delay-3 { animation-delay: 0.4s; }
-  .animate-delay-4 { animation-delay: 0.55s; }
-  .animate-delay-5 { animation-delay: 0.7s; }
-
-  /* Glow line accents */
-  .glow-line {
-    height: 1px;
-    background: linear-gradient(90deg, transparent, var(--accent), transparent);
-    opacity: 0.4;
-    margin: 0;
-  }
-
-  /* scroll reveal */
-  .reveal {
+  /* ANIMATIONS on load */
+  .fade-up {
     opacity: 0;
     transform: translateY(24px);
     transition: opacity 0.7s ease, transform 0.7s ease;
   }
-
-  .reveal.visible {
+  .fade-up.visible {
     opacity: 1;
-    transform: none;
+    transform: translateY(0);
   }
 
-  /* Chip viz */
-  .chip-viz {
-    border: 1px solid var(--border);
-    background: var(--bg2);
-    padding: 28px;
-    margin-top: 48px;
-    font-size: 12px;
+  /* RESPONSIVE */
+  @media (max-width: 1100px) {
+    .hero { grid-template-columns: 1fr; }
+    .hero-right { display: none; }
+    .hero-left { padding: 10rem 4rem 6rem; }
+    .problem-grid, .comp-intro, .audience-grid { grid-template-columns: 1fr; }
+    .pricing-grid { grid-template-columns: 1fr 1fr; }
+    .models-grid { grid-template-columns: 1fr 1fr 1fr; }
+    .pipeline-visual { grid-template-columns: 1fr; }
+    section { padding: 5rem 3rem; }
+    .footer-grid { grid-template-columns: 1fr 1fr; }
   }
 
-  .chip-label {
-    font-size: 10px;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    color: var(--muted);
-    margin-bottom: 16px;
+  @media (max-width: 600px) {
+    .pricing-grid, .models-grid { grid-template-columns: 1fr; }
+    section { padding: 4rem 1.5rem; }
+    nav { padding: 1rem 1.5rem; }
+    nav ul { display: none; }
+    footer { padding: 4rem 1.5rem 2rem; }
+    .footer-grid { grid-template-columns: 1fr; }
   }
 
-  .chip-bar-row {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin-bottom: 10px;
-  }
-
-  .chip-name {
-    width: 40px;
-    color: var(--muted);
-    font-size: 11px;
-    text-align: right;
-    flex-shrink: 0;
-  }
-
-  .chip-bar {
-    height: 20px;
-    display: flex;
-    align-items: center;
-    padding: 0 8px;
-    font-size: 10px;
-    font-weight: 700;
-    letter-spacing: 0.1em;
-    color: var(--bg);
-    transition: width 1s ease;
-  }
-
-  .chip-bar.npu { background: var(--accent); }
-  .chip-bar.gpu { background: var(--accent2); }
-  .chip-bar.cpu { background: var(--accent2); }
-
-  .chip-pct {
-    font-size: 11px;
-    color: var(--muted);
-    margin-left: 4px;
-  }
-
-  @media (max-width: 700px) {
-    nav { padding: 16px 20px; }
-    .nav-links { display: none; }
-    section, section.full-width { padding: 100px 20px 60px; }
-    footer { padding: 24px 20px; flex-direction: column; gap: 8px; text-align: center; }
+  /* HIGHLIGHT ELEMENT */
+  .highlight-box {
+    background: linear-gradient(135deg, rgba(90,145,64,0.08), rgba(201,124,42,0.06));
+    border: 1px solid var(--lichen);
+    border-left: 4px solid var(--leaf);
+    padding: 1.5rem 2rem;
+    border-radius: 0 4px 4px 0;
+    margin: 2rem 0;
+    font-family: 'Lora', serif;
+    font-style: italic;
+    font-size: 1.05rem;
+    line-height: 1.7;
+    color: var(--canopy);
   }
 </style>
 </head>
 <body>
 
+<!-- CURSOR -->
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursor-ring"></div>
+
 <!-- NAV -->
 <nav>
-  <div class="nav-logo">SMM<span> / Small Model Marketplace</span></div>
-  <ul class="nav-links">
+  <div class="nav-logo">
+    <div class="leaf-icon"></div>
+    SMM
+  </div>
+  <ul>
     <li><a href="#problem">Problem</a></li>
-    <li><a href="#solution">Solution</a></li>
-    <li><a href="#competitive">Landscape</a></li>
-    <li><a href="#customers">Customers</a></li>
+    <li><a href="#product">Product</a></li>
+    <li><a href="#audience">Customers</a></li>
     <li><a href="#pricing">Pricing</a></li>
     <li><a href="#roadmap">Roadmap</a></li>
   </ul>
+  <button class="nav-cta">Get Early Access</button>
 </nav>
 
 <!-- HERO -->
-<section class="hero">
-  <div class="hero-eyebrow animate animate-delay-1">On-Device AI Infrastructure</div>
-  <h1 class="hero-title animate animate-delay-2">
-    Run any model.<br>
-    <em>On any device.</em><br>
-    Right now.
-  </h1>
-  <p class="hero-sub animate animate-delay-3">
-    We are the reliability and distribution layer between any model and any device — solving chip fragmentation, ANE inconsistency, thermal throttling, and OS fragmentation.
-  </p>
-  <div class="hero-cta animate animate-delay-4">
-    <a href="#solution" class="btn btn-primary">See How It Works →</a>
-    <a href="#competitive" class="btn btn-ghost">View Competitive Landscape</a>
-  </div>
-
-  <div class="hero-stats animate animate-delay-5">
-    <div class="stat-item">
-      <span class="stat-num">3</span>
-      <span class="stat-label">Chip backends unified</span>
-    </div>
-    <div class="stat-item">
-      <span class="stat-num">1</span>
-      <span class="stat-label">SDK for all devices</span>
-    </div>
-    <div class="stat-item">
-      <span class="stat-num">Day&thinsp;1</span>
-      <span class="stat-label">Hardware support SLA</span>
-    </div>
-    <div class="stat-item">
-      <span class="stat-num">$0</span>
-      <span class="stat-label">SDK cost</span>
-    </div>
-  </div>
-</section>
-
-<div class="glow-line"></div>
-
-<!-- PROBLEM -->
-<section id="problem">
-  <div class="section-label reveal">01 — The Problem</div>
-  <h2 class="section-title reveal">The on-device AI stack<br>is fundamentally broken.</h2>
-  <p class="section-body reveal">
-    Apple, Google, and Qualcomm each built their own neural silicon. Nobody built the layer that makes it all work together. Every major alternative is open-source with no monetization incentive to stay current.
-  </p>
-
-  <div class="problems-grid">
-    <div class="problem-card reveal" data-num="01">
-      <div class="problem-tag">Infrastructure</div>
-      <div class="problem-title">Underdeveloped Infrastructure</div>
-      <div class="problem-desc">Apple Intelligence is locked to new hardware. The ANE chip sits unused in most iPhones because Apple's own tooling can't expose it consistently. CoreML is unreliable in production.</div>
-    </div>
-    <div class="problem-card reveal" data-num="02">
-      <div class="problem-tag">Cost</div>
-      <div class="problem-title">Flat, Ongoing API Cost</div>
-      <div class="problem-desc">Developers want AI that's invisible — OCR, intent parsing, classification. Cloud APIs create ongoing costs and a hard dependency. Every inference call is a liability.</div>
-    </div>
-    <div class="problem-card reveal" data-num="03">
-      <div class="problem-tag">Compliance</div>
-      <div class="problem-title">Privacy & Regulation</div>
-      <div class="problem-desc">GDPR, CCPA, HIPAA, SOC 2, ITAR. On-device processing eliminates entire categories of data transfer obligations. The privacy pitch is simple: the data never leaves.</div>
-    </div>
-    <div class="problem-card reveal" data-num="04">
-      <div class="problem-tag">Silicon</div>
-      <div class="problem-title">Hardware Fragmentation</div>
-      <div class="problem-desc">Apple calls it Neural Engine. Qualcomm calls it Hexagon. Google ships TPUs on Pixels. Split workloads across GPU, CPU, and NPU simultaneously — complexity explodes.</div>
-    </div>
-  </div>
-</section>
-
-<div class="glow-line"></div>
-
-<!-- SOLUTION -->
-<section id="solution">
-  <div class="section-label reveal">02 — What We're Building</div>
-
-  <div class="build-layout">
-    <div>
-      <h2 class="section-title reveal">We are infrastructure.<br>We make models<br><em style="color:var(--accent); font-style:normal;">shippable.</em></h2>
-      <p class="section-body reveal">
-        An SDK and platform that reliably runs small models on any device — handling chip routing, optimization, and reliability so developers don't have to. On top of that, a marketplace where model creators distribute specialized models directly to developers.
-      </p>
-
-      <div class="pipeline reveal">
-        <div class="pipeline-step">
-          <div class="step-icon">01</div>
-          <div>
-            <div class="step-label">Pre-Ship</div>
-            <div class="step-title">Optimize & Predict</div>
-            <div class="step-desc">Automatic model optimization for target device profiles. Chip split visibility — GPU vs CPU vs NPU. Estimated latency before you ship. Flags models that won't run acceptably.</div>
-          </div>
-        </div>
-        <div class="pipeline-step">
-          <div class="step-icon">02</div>
-          <div>
-            <div class="step-label">At-Ship</div>
-            <div class="step-title">Dead Simple Integration</div>
-            <div class="step-desc">Single SDK regardless of device or OS. Write once — SDK handles CoreML / NNAPI / QNN routing underneath. Model bundling, download management, staged loading built in.</div>
-          </div>
-        </div>
-        <div class="pipeline-step">
-          <div class="step-icon">03</div>
-          <div>
-            <div class="step-label">Post-Ship</div>
-            <div class="step-title">Production Observability</div>
-            <div class="step-desc">Real user device telemetry — actual latency, memory, thermal events, failures. Segmented by device model, OS version, chip generation. Drift detection when OS updates break performance.</div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="reveal">
-      <div class="terminal">
-        <div class="terminal-bar">
-          <div class="term-dot"></div>
-          <div class="term-dot"></div>
-          <div class="term-dot"></div>
-          <span class="term-label">smm-sdk — device-profile.log</span>
-        </div>
-        <div class="terminal-body">
-          <div><span class="term-comment">// Pre-ship device matrix</span></div>
-          <div><span class="term-cmd">$ smm analyze</span> ./models/ocr-v2.onnx</div>
-          <div>&nbsp;</div>
-          <div><span class="term-key">Device:</span> <span class="term-val">iPhone 14 (A15)</span></div>
-          <div><span class="term-key">NPU:</span>    <span class="term-val">68%</span> <span class="term-dim">████████████░░░░░░</span></div>
-          <div><span class="term-key">GPU:</span>    <span class="term-val">24%</span> <span class="term-dim">████░░░░░░░░░░░░░░</span></div>
-          <div><span class="term-key">CPU:</span>    <span class="term-val"> 8%</span> <span class="term-dim">█░░░░░░░░░░░░░░░░░</span></div>
-          <div>&nbsp;</div>
-          <div><span class="term-key">P50 latency:</span>  <span class="term-val">18ms</span></div>
-          <div><span class="term-key">P99 latency:</span>  <span class="term-val">31ms</span></div>
-          <div><span class="term-key">Memory:</span>       <span class="term-val">210MB / 512MB</span></div>
-          <div><span class="term-key">Thermal risk:</span> <span class="term-val">LOW</span> <span class="term-success">✓</span></div>
-          <div>&nbsp;</div>
-          <div><span class="term-key">Device:</span> <span class="term-val">Galaxy S23 (Hexagon)</span></div>
-          <div><span class="term-key">NPU:</span>    <span class="term-val">71%</span> <span class="term-dim">█████████████░░░░░</span></div>
-          <div><span class="term-key">P50 latency:</span>  <span class="term-val">22ms</span></div>
-          <div>&nbsp;</div>
-          <div><span class="term-success">✓ Model cleared for production across 94 device profiles.</span><span class="cursor"></span></div>
-        </div>
-      </div>
-
-      <div class="chip-viz reveal" style="margin-top: 16px;">
-        <div class="chip-label">Chip split — iPhone 15 Pro · ocr-v2.onnx · live telemetry</div>
-        <div class="chip-bar-row">
-          <span class="chip-name">NPU</span>
-          <div class="chip-bar npu" style="width: 61%;">NPU</div>
-          <span class="chip-pct">61%</span>
-        </div>
-        <div class="chip-bar-row">
-          <span class="chip-name">GPU</span>
-          <div class="chip-bar gpu" style="width: 28%;">GPU</div>
-          <span class="chip-pct">28%</span>
-        </div>
-        <div class="chip-bar-row">
-          <span class="chip-name">CPU</span>
-          <div class="chip-bar cpu" style="width: 11%;">CPU</div>
-          <span class="chip-pct">11%</span>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<div class="glow-line"></div>
-
-<!-- COMPETITIVE -->
-<section id="competitive" class="full-width">
-  <div style="max-width: 1200px; margin: 0 auto;">
-    <div class="section-label reveal">03 — Competitive Landscape</div>
-    <h2 class="section-title reveal">Every alternative is open-source<br>with no incentive to stay current.</h2>
-    <p class="section-body reveal">
-      When Apple ships new silicon, ONNX and CoreML wrappers lag. We guarantee Day 1 support because our revenue depends on it. The sustainability gap is as real as the technical gap.
+<section class="hero" id="top">
+  <div class="hero-left">
+    <p class="hero-eyebrow">On-Device AI Infrastructure</p>
+    <h1 class="hero-title">
+      Run any <em>model</em>,<br>
+      on any <span class="accent-word">device</span>,<br>
+      right now.
+    </h1>
+    <p class="hero-sub">
+      We are the reliability and distribution layer between any model and any device — solving chip fragmentation, thermal throttling, and OS fragmentation, so you never have to.
     </p>
-
-    <div class="reveal" style="overflow-x: auto;">
-      <table class="comp-table">
-        <thead>
-          <tr>
-            <th>Tool</th>
-            <th>Technical Reality</th>
-            <th>Sustainability</th>
-            <th>Production Gap</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>ONNX Runtime</td>
-            <td>Wraps CoreML — no direct ANE access. Static workload routing. Cloud-first design.</td>
-            <td>Community-maintained. No revenue incentive to update for new hardware.</td>
-            <td>No production telemetry. No chip split visibility. Inconsistent device reliability.</td>
-          </tr>
-          <tr>
-            <td>CoreML</td>
-            <td>Apple-native. Best ANE access available — Apple-only by definition.</td>
-            <td>Apple-maintained but incentive is ecosystem lock-in, not cross-platform.</td>
-            <td>Poorly documented edge cases. Reliability varies across A-series generations.</td>
-          </tr>
-          <tr>
-            <td>TFLite / LiteRT</td>
-            <td>Google's edge inference answer. Delegate system for hardware acceleration.</td>
-            <td>Google-maintained. History of sunsetting developer tools.</td>
-            <td>NNAPI delegate inconsistent. No production observability.</td>
-          </tr>
-          <tr>
-            <td>Us <span class="badge badge-good">→</span></td>
-            <td>Abstracts all backends (CoreML, NNAPI, QNN). Dynamic runtime routing. Single SDK.</td>
-            <td>B2B SaaS — revenue aligned with staying current. Paid SLAs. <span class="badge badge-good">Funded</span></td>
-            <td>Pre-ship optimization + chip split visibility + post-ship telemetry. Full stack.</td>
-          </tr>
-        </tbody>
-      </table>
+    <div class="hero-actions">
+      <button class="btn-primary">Explore the SDK</button>
+      <button class="btn-ghost">View Marketplace</button>
     </div>
+  </div>
+  <div class="hero-right">
+    <div class="hero-botanical">
+      <!-- Botanical / circuit hybrid SVG -->
+      <svg class="botanical-svg" viewBox="0 0 600 600" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <!-- Background radial glow -->
+        <circle cx="300" cy="300" r="240" fill="url(#glow)" opacity="0.3"/>
+        <!-- Central node -->
+        <circle cx="300" cy="300" r="18" fill="#5a9140" opacity="0.9"/>
+        <circle cx="300" cy="300" r="30" fill="none" stroke="#5a9140" stroke-width="1" opacity="0.4"/>
+        <circle cx="300" cy="300" r="50" fill="none" stroke="#5a9140" stroke-width="0.5" opacity="0.2"/>
+
+        <!-- Circuit branches (stems) -->
+        <line x1="300" y1="300" x2="300" y2="120" stroke="#3d6b2e" stroke-width="1.5"/>
+        <line x1="300" y1="300" x2="180" y2="200" stroke="#3d6b2e" stroke-width="1.5"/>
+        <line x1="300" y1="300" x2="420" y2="200" stroke="#3d6b2e" stroke-width="1.5"/>
+        <line x1="300" y1="300" x2="480" y2="380" stroke="#3d6b2e" stroke-width="1.5"/>
+        <line x1="300" y1="300" x2="120" y2="380" stroke="#3d6b2e" stroke-width="1.5"/>
+        <line x1="300" y1="300" x2="300" y2="490" stroke="#3d6b2e" stroke-width="1.5"/>
+
+        <!-- Device nodes at branch ends -->
+        <rect x="275" y="95" width="50" height="28" rx="4" fill="#1a3012" stroke="#5a9140" stroke-width="1"/>
+        <text x="300" y="114" text-anchor="middle" font-family="monospace" font-size="9" fill="#8cbf5e">iPhone</text>
+
+        <rect x="148" y="185" width="50" height="28" rx="4" fill="#1a3012" stroke="#5a9140" stroke-width="1"/>
+        <text x="173" y="204" text-anchor="middle" font-family="monospace" font-size="9" fill="#8cbf5e">Pixel</text>
+
+        <rect x="397" y="185" width="58" height="28" rx="4" fill="#1a3012" stroke="#5a9140" stroke-width="1"/>
+        <text x="426" y="204" text-anchor="middle" font-family="monospace" font-size="9" fill="#8cbf5e">Galaxy</text>
+
+        <rect x="455" y="365" width="52" height="28" rx="4" fill="#1a3012" stroke="#c97c2a" stroke-width="1"/>
+        <text x="481" y="384" text-anchor="middle" font-family="monospace" font-size="9" fill="#e8a93c">Mac M-</text>
+
+        <rect x="94" y="365" width="52" height="28" rx="4" fill="#1a3012" stroke="#c97c2a" stroke-width="1"/>
+        <text x="120" y="384" text-anchor="middle" font-family="monospace" font-size="9" fill="#e8a93c">Watch</text>
+
+        <rect x="275" y="463" width="50" height="28" rx="4" fill="#1a3012" stroke="#5a9140" stroke-width="1"/>
+        <text x="300" y="482" text-anchor="middle" font-family="monospace" font-size="9" fill="#8cbf5e">Tablet</text>
+
+        <!-- Leaf nodes along branches -->
+        <!-- Leaf 1 -->
+        <ellipse cx="300" cy="200" rx="22" ry="12" fill="#2d4a22" stroke="#5a9140" stroke-width="0.8" transform="rotate(-20,300,200)"/>
+        <!-- Leaf 2 -->
+        <ellipse cx="238" cy="248" rx="18" ry="10" fill="#2d4a22" stroke="#5a9140" stroke-width="0.8" transform="rotate(40,238,248)"/>
+        <!-- Leaf 3 -->
+        <ellipse cx="362" cy="248" rx="18" ry="10" fill="#2d4a22" stroke="#5a9140" stroke-width="0.8" transform="rotate(-40,362,248)"/>
+        <!-- Leaf 4 -->
+        <ellipse cx="392" cy="342" rx="20" ry="10" fill="#2d4a22" stroke="#8cbf5e" stroke-width="0.8" transform="rotate(25,392,342)"/>
+        <!-- Leaf 5 -->
+        <ellipse cx="208" cy="342" rx="20" ry="10" fill="#2d4a22" stroke="#8cbf5e" stroke-width="0.8" transform="rotate(-25,208,342)"/>
+
+        <!-- Chip icons - small squares representing NPU/GPU/CPU -->
+        <rect x="288" y="258" width="24" height="24" rx="2" fill="#1a3012" stroke="#c97c2a" stroke-width="0.8"/>
+        <text x="300" y="274" text-anchor="middle" font-family="monospace" font-size="7" fill="#e8a93c">NPU</text>
+        <rect x="316" y="258" width="24" height="24" rx="2" fill="#1a3012" stroke="#5a9140" stroke-width="0.8"/>
+        <text x="328" y="274" text-anchor="middle" font-family="monospace" font-size="7" fill="#8cbf5e">GPU</text>
+        <rect x="260" y="258" width="24" height="24" rx="2" fill="#1a3012" stroke="#5a9140" stroke-width="0.8"/>
+        <text x="272" y="274" text-anchor="middle" font-family="monospace" font-size="7" fill="#8cbf5e">CPU</text>
+
+        <!-- Pulsing rings on center node -->
+        <circle cx="300" cy="300" r="18" fill="none" stroke="#5a9140" stroke-width="1" opacity="0.6">
+          <animate attributeName="r" from="18" to="80" dur="3s" repeatCount="indefinite"/>
+          <animate attributeName="opacity" from="0.6" to="0" dur="3s" repeatCount="indefinite"/>
+        </circle>
+        <circle cx="300" cy="300" r="18" fill="none" stroke="#8cbf5e" stroke-width="0.5" opacity="0.4">
+          <animate attributeName="r" from="18" to="80" dur="3s" begin="1s" repeatCount="indefinite"/>
+          <animate attributeName="opacity" from="0.4" to="0" dur="3s" begin="1s" repeatCount="indefinite"/>
+        </circle>
+
+        <!-- Gradient defs -->
+        <defs>
+          <radialGradient id="glow" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="#5a9140"/>
+            <stop offset="100%" stop-color="transparent"/>
+          </radialGradient>
+        </defs>
+
+        <!-- Small dotted grid -->
+        <pattern id="dots" x="0" y="0" width="30" height="30" patternUnits="userSpaceOnUse">
+          <circle cx="1" cy="1" r="0.8" fill="#3d6b2e" opacity="0.5"/>
+        </pattern>
+        <rect x="0" y="0" width="600" height="600" fill="url(#dots)" opacity="0.3"/>
+      </svg>
+    </div>
+    <div class="floating-stat">
+      <span class="stat-num">Day 1</span>
+      <span class="stat-label">New hardware support SLA</span>
+    </div>
+    <div class="floating-stat">
+      <span class="stat-num">∞</span>
+      <span class="stat-label">Device types supported</span>
+    </div>
+    <div class="floating-stat">
+      <span class="stat-num">0₸</span>
+      <span class="stat-label">Cloud API cost per inference</span>
+    </div>
+  </div>
+
+  <div class="scroll-hint">
+    <span>Scroll</span>
+    <div class="arrow"></div>
   </div>
 </section>
 
-<div class="glow-line"></div>
-
-<!-- CUSTOMERS -->
-<section id="customers">
-  <div class="section-label reveal">04 — Who We Build For</div>
-  <h2 class="section-title reveal">Four distinct segments.<br>One common need.</h2>
-  <p class="section-body reveal">
-    From Chinese iOS developers legally blocked from Western cloud APIs, to enterprise teams who can't bet their product on open-source maintainability.
-  </p>
-
-  <div class="segments-grid reveal">
-    <div class="segment-card">
-      <div class="segment-flag">Day-One TAM</div>
-      <div class="segment-title">Chinese iOS Developers</div>
-      <div class="segment-desc">Legally blocked from Western cloud APIs. The pitch isn't cheaper — it's the only viable option. Strong OCR and translation use cases. High urgency, immediate need.</div>
-    </div>
-    <div class="segment-card">
-      <div class="segment-flag">Compliance</div>
-      <div class="segment-title">EU / GDPR Teams</div>
-      <div class="segment-desc">"Never leaves the device" eliminates legal review entirely. Strong signal in German and Dutch indie dev communities. Removes the GDPR conversation completely.</div>
-    </div>
-    <div class="segment-card">
-      <div class="segment-flag">ROI</div>
-      <div class="segment-title">High-Volume Apps</div>
-      <div class="segment-desc">Apps processing large image or text volumes pay real API costs. Direct, quantifiable savings — OCR at scale, moderation, classification. Pure cost elimination play.</div>
-    </div>
-    <div class="segment-card">
-      <div class="segment-flag">Enterprise</div>
-      <div class="segment-title">Enterprise App Teams</div>
-      <div class="segment-desc">Shipping SLM-powered features and can't bet on open-source maintainability. Need SLAs and support. Higher ACV, longer cycle. Best fit for Enterprise tier.</div>
-    </div>
-  </div>
-</section>
-
-<div class="glow-line"></div>
-
-<!-- PRICING -->
-<section id="pricing">
-  <div class="section-label reveal">05 — Monetization</div>
-  <h2 class="section-title reveal">Free SDK.<br>Paid insights & guarantees.</h2>
-  <p class="section-body reveal">
-    The Sentry / Datadog / Segment model. Free instrumentation, paid insights and reliability. The SDK removes all adoption friction. We monetize the tooling around it.
-  </p>
-
-  <div class="pricing-grid">
-    <div class="price-card reveal">
-      <div class="price-tier">Free</div>
-      <div class="price-amount">$0</div>
-      <div class="price-period">forever, no strings</div>
-      <ul class="price-features">
-        <li>SDK + runtime</li>
-        <li>Limited device matrix</li>
-        <li>Community support</li>
-        <li>Hugging Face model integration</li>
-        <li>Bring your own models</li>
-      </ul>
-    </div>
-    <div class="price-card featured reveal">
-      <div class="price-tier">Pro</div>
-      <div class="price-amount">SaaS</div>
-      <div class="price-period">monthly / annual</div>
-      <ul class="price-features">
-        <li>Full device test matrix</li>
-        <li>Production telemetry</li>
-        <li>Chip split visibility</li>
-        <li>Latency percentile reports</li>
-        <li>Drift detection alerts</li>
-      </ul>
-    </div>
-    <div class="price-card reveal">
-      <div class="price-tier">Enterprise</div>
-      <div class="price-amount">Contract</div>
-      <div class="price-period">annual</div>
-      <ul class="price-features">
-        <li>SLA guarantees</li>
-        <li>Day 1 new hardware support</li>
-        <li>Private model hosting</li>
-        <li>Dedicated support</li>
-        <li>SOC 2 / compliance docs</li>
-      </ul>
-    </div>
-    <div class="price-card reveal">
-      <div class="price-tier">Marketplace</div>
-      <div class="price-amount">Rev Share</div>
-      <div class="price-period">per transaction</div>
-      <ul class="price-features">
-        <li>Platform cut on paid model listings</li>
-        <li>Model creators get distribution</li>
-        <li>Curated optimized models</li>
-        <li>Fine-tuned vertical models</li>
-        <li>Grows with catalog depth</li>
-      </ul>
-    </div>
-  </div>
-</section>
-
-<div class="glow-line"></div>
-
-<!-- ROADMAP -->
-<section id="roadmap">
-  <div class="section-label reveal">06 — Sequencing</div>
-  <h2 class="section-title reveal">When Cartesia hits the<br>iOS wall, we're already there.</h2>
-  <p class="section-body reveal">
-    Deliberate sequencing from runtime ownership to network effects. Each phase creates the foundation for the next.
-  </p>
-
-  <div class="roadmap">
-    <div class="roadmap-item reveal">
-      <div class="roadmap-dot active">01</div>
-      <div class="roadmap-content">
-        <div class="roadmap-phase">Now — Phase 1</div>
-        <div class="roadmap-title">Own the Runtime Layer</div>
-        <div class="roadmap-desc">Get into real codebases. Port first models in-house or via flat-fee contracts. No public announcement. No open marketplace yet. Build the thing that actually works.</div>
-      </div>
-    </div>
-    <div class="roadmap-item reveal">
-      <div class="roadmap-dot">02</div>
-      <div class="roadmap-content">
-        <div class="roadmap-phase">Near Term — Phase 2</div>
-        <div class="roadmap-title">Become the Default Suggestion</div>
-        <div class="roadmap-desc">SDK soft launch on GitHub. Tutorials go live. Engage dev communities as a resource, not a product. Seed into high-starred repos. Become what Cursor and Copilot suggest for on-device AI.</div>
-      </div>
-    </div>
-    <div class="roadmap-item reveal">
-      <div class="roadmap-dot">03</div>
-      <div class="roadmap-content">
-        <div class="roadmap-phase">Phase 3</div>
-        <div class="roadmap-title">Public Launch + Device Testing Platform</div>
-        <div class="roadmap-desc">Public launch once real usage exists. Lead with the technical story. Device testing platform goes live — the Datadog moment for on-device AI. Marketplace opens.</div>
-      </div>
-    </div>
-    <div class="roadmap-item reveal">
-      <div class="roadmap-dot">∞</div>
-      <div class="roadmap-content">
-        <div class="roadmap-phase">Long Term</div>
-        <div class="roadmap-title">Network Effects + Marketplace</div>
-        <div class="roadmap-desc">Marketplace fills with specialized models. Going direct becomes less attractive than listing on the platform everyone already uses. Steam, not CUDA.</div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<div class="glow-line"></div>
-
-<!-- CTA -->
-<div class="cta-section">
-  <div class="section-label reveal" style="justify-content: center;">Get in Touch</div>
-  <h2 class="cta-title reveal">Put your model in.<br>We handle <em style="color:var(--accent); font-style:normal;">every device.</em></h2>
-  <p class="cta-sub reveal">
-    We don't make models. We make models shippable. If you're building on-device AI and running into the hardware wall, we should talk.
-  </p>
-  <div class="reveal">
-    <a href="mailto:hello@smallmodelmarketplace.com" class="btn btn-primary" style="font-size: 13px; padding: 16px 36px;">Get Early Access →</a>
+<!-- TAGLINE BAND -->
+<div class="tagline-band">
+  <div class="tagline-track">
+    <span>Run Any Model</span> · On Any Device · No Cloud Required · Privacy by Default ·
+    <span>ANE. NPU. GPU. CPU.</span> · Cross-Platform Inference · Chip Split Visibility ·
+    <span>Day 1 Hardware Support</span> · Production Telemetry · Marketplace Distribution ·
+    <span>Run Any Model</span> · On Any Device · No Cloud Required · Privacy by Default ·
+    <span>ANE. NPU. GPU. CPU.</span> · Cross-Platform Inference · Chip Split Visibility ·
+    <span>Day 1 Hardware Support</span> · Production Telemetry · Marketplace Distribution ·
   </div>
 </div>
 
+<!-- PROBLEM -->
+<section class="problem" id="problem">
+  <div class="section-label">The Problem</div>
+  <h2 class="section-title">The infrastructure<br>is broken.</h2>
+  <p class="section-body">Apple's Neural Engine sits idle. Android depends on the cloud. CoreML fails in production. Developers are left debugging fragmented hardware with zero visibility.</p>
+
+  <div class="problem-grid">
+    <div class="problem-card fade-up">
+      <div class="problem-card-num">01</div>
+      <div class="problem-card-title">Underdeveloped Infrastructure</div>
+      <p>Apple Intelligence is locked to new hardware. The ANE chip sits unused in most iPhones because Apple's own tooling can't expose it consistently. CoreML is unreliable in production. Developers are fighting hardware they don't control.</p>
+      <span class="problem-card-tag">ANE · CoreML · NNAPI</span>
+    </div>
+    <div class="problem-card fade-up">
+      <div class="problem-card-num">02</div>
+      <div class="problem-card-title">Flat, Ongoing Cloud Cost</div>
+      <p>Developers want AI that's invisible — OCR, intent parsing, classification. Cloud APIs create ongoing costs and a hard dependency. Every inference is a billing event. Every outage is your outage.</p>
+      <span class="problem-card-tag">Cost Elimination</span>
+    </div>
+    <div class="problem-card fade-up">
+      <div class="problem-card-num">03</div>
+      <div class="problem-card-title">Privacy & Compliance</div>
+      <p>Personal data that never leaves the device eliminates entire categories of GDPR, CCPA, and HIPAA exposure. On-device inference keeps user data out of third-party cloud infrastructure entirely.</p>
+      <span class="problem-card-tag">GDPR · HIPAA · CCPA</span>
+    </div>
+    <div class="problem-card fade-up">
+      <div class="problem-card-num">04</div>
+      <div class="problem-card-title">Hardware Fragmentation</div>
+      <p>Apple calls it the Neural Engine. Qualcomm calls it Hexagon. Google ships TPUs on Pixel phones. Every chipset is different — and when you split workloads across GPU, CPU, and NPU simultaneously, complexity explodes.</p>
+      <span class="problem-card-tag">Hexagon · A18 · Tensor G4</span>
+    </div>
+  </div>
+</section>
+
+<!-- PRODUCT -->
+<section class="product" id="product">
+  <div class="section-label" style="color: var(--sprout);">What We Build</div>
+  <h2 class="section-title">Infrastructure.<br>Not models.</h2>
+  <p class="section-body">We make models shippable. An SDK and platform that reliably runs small models on any device hardware — handling chip routing, optimization, and reliability — so developers never have to think about it.</p>
+
+  <div class="highlight-box" style="border-left-color: var(--gold); background: rgba(232,169,60,0.07); color: var(--honey); border-color: rgba(232,169,60,0.2);">
+    "Put your model in. We handle every device. You get full visibility into how."
+  </div>
+
+  <div class="pipeline-visual">
+    <div class="pipeline-step">
+      <div class="pipeline-step-phase">Phase 1 — Pre-Ship</div>
+      <div class="pipeline-step-title">Optimize & Predict</div>
+      <ul>
+        <li>Automatic model optimization for target device profiles</li>
+        <li>Chip split visibility — GPU vs CPU vs NPU per device class</li>
+        <li>Estimated latency and memory footprint before shipping</li>
+        <li>Flags models that won't run acceptably before users see them</li>
+      </ul>
+    </div>
+    <div class="pipeline-step" style="border-left: 1px solid rgba(140,191,94,0.15); border-right: 1px solid rgba(140,191,94,0.15);">
+      <div class="pipeline-step-phase">Phase 2 — At-Ship</div>
+      <div class="pipeline-step-title">Dead Simple Integration</div>
+      <ul>
+        <li>Single SDK regardless of device or OS</li>
+        <li>Write once — SDK handles CoreML / NNAPI / QNN routing</li>
+        <li>Model bundling, download management, staged loading built in</li>
+        <li>Day 1 support for new hardware releases</li>
+      </ul>
+    </div>
+    <div class="pipeline-step">
+      <div class="pipeline-step-phase">Phase 3 — Post-Ship</div>
+      <div class="pipeline-step-title">Production Observability</div>
+      <ul>
+        <li>Real user device telemetry — actual latency, memory, thermal events</li>
+        <li>Segmented by device model, OS version, and chip generation</li>
+        <li>Drift detection when performance degrades after OS updates</li>
+        <li>The Datadog moment for on-device AI</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- COMPETITIVE -->
+<section class="competitive" id="competitive">
+  <div class="comp-intro">
+    <div>
+      <div class="section-label">Landscape</div>
+      <h2 class="section-title">Why existing tools fall short.</h2>
+    </div>
+    <div>
+      <p class="section-body" style="margin-top: 3rem;">
+        Every major alternative is open-source with no monetization incentive to stay current. When Apple ships a new chip, ONNX and CoreML wrappers lag. We guarantee Day 1 support because our revenue depends on it.
+      </p>
+      <div class="highlight-box">
+        The sustainability gap is as real as the technical gap.
+      </div>
+    </div>
+  </div>
+
+  <table class="comp-table">
+    <thead>
+      <tr>
+        <th>Tool</th>
+        <th>Technical Reality</th>
+        <th>Sustainability</th>
+        <th>Critical Gap</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>ONNX Runtime</td>
+        <td>Wraps CoreML — no direct ANE access. Static workload routing. Cloud-first design.</td>
+        <td>Community-maintained. No revenue incentive for new hardware updates.</td>
+        <td>No production telemetry. No chip split visibility. Inconsistent device reliability.</td>
+      </tr>
+      <tr>
+        <td>CoreML</td>
+        <td>Apple-native. Best ANE access available. Apple-only by definition.</td>
+        <td>Apple-maintained but incentive is ecosystem lock-in, not developer productivity.</td>
+        <td>Poorly documented edge cases. Reliability varies across A-series generations.</td>
+      </tr>
+      <tr>
+        <td>TFLite / LiteRT</td>
+        <td>Google's edge inference answer. Delegate system for hardware acceleration.</td>
+        <td>Google-maintained. History of sunsetting developer tools without warning.</td>
+        <td>NNAPI delegate inconsistent. No production observability. No chip visibility.</td>
+      </tr>
+      <tr class="highlight-row">
+        <td>SMM <span class="badge badge-green">Us</span></td>
+        <td>Abstracts all backends (CoreML, NNAPI, QNN). Dynamic runtime routing. Single SDK.</td>
+        <td>B2B SaaS — revenue directly aligned with staying current. Paid SLAs.</td>
+        <td>Pre-ship optimization + chip split visibility + post-ship telemetry. Full stack. <span class="badge badge-amber">Unique</span></td>
+      </tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- AUDIENCE -->
+<section class="audience" id="audience">
+  <div class="section-label">Who We Serve</div>
+  <h2 class="section-title">Four segments.<br>One platform.</h2>
+  <p class="section-body">From blocked developers in China to compliance-bound teams in Berlin to high-volume apps bleeding on API costs — the pitch changes. The solution doesn't.</p>
+
+  <div class="audience-grid">
+    <div class="audience-card fade-up">
+      <span class="audience-flag">Day-One TAM</span>
+      <div class="audience-card-title">Chinese iOS Developers</div>
+      <p>Legally blocked from Western cloud APIs. The pitch is not cheaper — it is the only viable option. Strong OCR and translation use cases fit the small model specification perfectly.</p>
+      <div class="audience-card-note">High urgency. Strong fit. Immediate revenue potential.</div>
+    </div>
+    <div class="audience-card fade-up">
+      <span class="audience-flag amber">Privacy Leaders</span>
+      <div class="audience-card-title">EU / GDPR Developers</div>
+      <p>"Never leaves the device" eliminates their legal review entirely. Strong signal in German and Dutch indie dev communities. The sales conversation simplifies to: eliminate complex GDPR integration.</p>
+      <div class="audience-card-note">Privacy angle makes the pitch obvious.</div>
+    </div>
+    <div class="audience-card fade-up">
+      <span class="audience-flag bark">Pure ROI</span>
+      <div class="audience-card-title">High-Volume Apps</div>
+      <p>Apps processing large image or text volumes pay real API costs. This is a quantifiable savings conversation — direct, measurable, defensible. Slower to convert but high-value accounts.</p>
+      <div class="audience-card-note">Direct sales motion. Longer cycle, bigger ACV.</div>
+    </div>
+    <div class="audience-card fade-up">
+      <span class="audience-flag terracotta">Enterprise</span>
+      <div class="audience-card-title">Enterprise App Teams</div>
+      <p>Shipping SLM-powered features and can't bet on open-source maintainability. Need SLAs, support, and certifications. SOC 2 Type II is a prerequisite for closing these deals.</p>
+      <div class="audience-card-note">Higher ACV. Longer sales cycle. Best Enterprise fit.</div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section class="pricing" id="pricing">
+  <div class="section-label">Monetization</div>
+  <h2 class="section-title">Free to run.<br>Paid to know.</h2>
+  <p class="section-body">The SDK is free. This removes all friction to adoption. We monetize the tooling and guarantees around it — not the runtime itself. The Sentry / Datadog / Segment model.</p>
+
+  <div class="pricing-grid">
+    <div class="price-card">
+      <div class="price-header">
+        <div class="price-tier">Free</div>
+        <div class="price-amount">$0</div>
+      </div>
+      <div class="price-body">
+        <p class="price-target">Developers evaluating and building.</p>
+        <ul class="price-features">
+          <li>SDK + runtime (full access)</li>
+          <li>Limited device matrix (5 profiles)</li>
+          <li>Community support</li>
+          <li>Hugging Face model integration</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="price-card featured">
+      <div class="price-header">
+        <div class="price-tier">Pro</div>
+        <div class="price-amount"><sub>from </sub>$49<sub>/mo</sub></div>
+      </div>
+      <div class="price-body">
+        <p class="price-target">Indie developers and small teams shipping real products.</p>
+        <ul class="price-features">
+          <li>Full device test matrix</li>
+          <li>Production telemetry dashboard</li>
+          <li>Chip split visibility per device</li>
+          <li>Latency percentile reports</li>
+          <li>Drift detection alerts</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="price-card">
+      <div class="price-header">
+        <div class="price-tier">Enterprise</div>
+        <div class="price-amount">Custom</div>
+      </div>
+      <div class="price-body">
+        <p class="price-target">Companies betting their product on on-device AI.</p>
+        <ul class="price-features">
+          <li>SLA guarantees</li>
+          <li>Day 1 hardware support</li>
+          <li>Private model hosting</li>
+          <li>Dedicated support channel</li>
+          <li>SOC 2 / HIPAA compliance docs</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="price-card">
+      <div class="price-header">
+        <div class="price-tier">Marketplace</div>
+        <div class="price-amount">Rev<sub> share</sub></div>
+      </div>
+      <div class="price-body">
+        <p class="price-target">Model creators who need cross-device distribution.</p>
+        <ul class="price-features">
+          <li>Platform % on paid model listings</li>
+          <li>Model creators get distribution</li>
+          <li>Curated + optimized model catalog</li>
+          <li>Fine-tuned / LoRA model sales</li>
+          <li>Grows with catalog depth</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ROADMAP -->
+<section class="roadmap" id="roadmap">
+  <div class="section-label" style="color: var(--sprout);">Roadmap</div>
+  <h2 class="section-title">Sequencing<br>matters.</h2>
+  <p class="section-body" style="color: rgba(240,247,230,0.6);">We don't announce until we exist. Distribution precedes the marketplace. Network effects reward patience.</p>
+
+  <div class="timeline">
+    <div class="timeline-item">
+      <div class="timeline-phase">Phase 1 — Now</div>
+      <div class="timeline-title">Own the Runtime Layer</div>
+      <div class="timeline-body">Get into real codebases. Port first models in-house or via flat-fee contracts. No public announcement. No open marketplace yet. Build before broadcasting.</div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-phase">Phase 2 — Near Term</div>
+      <div class="timeline-title">SDK Soft Launch</div>
+      <div class="timeline-body">SDK soft launch on GitHub. Tutorials go live in English and Chinese, structured to rank for iOS AI and Android AI. Engage dev communities as a resource, not a product. Seed the SDK into high-starred repos as a dependency. Become the default Cursor/Copilot suggestion.</div>
+    </div>
+    <div class="timeline-item future">
+      <div class="timeline-phase">Phase 3 — Public Launch</div>
+      <div class="timeline-title">Go Public With Real Usage</div>
+      <div class="timeline-body">Lead with the technical story. Device testing platform goes live. Marketplace opens. Documentation is written for LLM consumption first, humans second — so coding assistants suggest SMM by default.</div>
+    </div>
+    <div class="timeline-item future">
+      <div class="timeline-phase">Long Term</div>
+      <div class="timeline-title">Network Effects Compound</div>
+      <div class="timeline-body">When Cartesia and others hit the iOS/Android wall, we are already there. Marketplace fills with specialized models. Going direct becomes less attractive than listing on the platform everyone already uses.</div>
+    </div>
+  </div>
+</section>
+
+<!-- MODEL LANDSCAPE -->
+<section class="models" id="models">
+  <div class="section-label">Model Landscape</div>
+  <h2 class="section-title">Know your<br>size range.</h2>
+  <p class="section-body">From nano classifiers running on an A12 to medium-size agents on flagship silicon — every tier has a home on-device. Most marketplace models will live in the Small–Medium range.</p>
+
+  <div class="models-grid">
+    <div class="model-tier-card">
+      <div class="model-tier-name">Nano</div>
+      <div class="model-tier-range">50M – 500M</div>
+      <p>Any device (A12+, Android mid-range). Classifiers, keyword detection, OCR post-processing. Fastest inference, lowest battery draw.</p>
+    </div>
+    <div class="model-tier-card">
+      <div class="model-tier-name">Small</div>
+      <div class="model-tier-range">500M – 3B</div>
+      <p>A15+ / Android flagship. Light instruction following, NLU, translation, STT. 4-bit quant fits 1–2GB RAM. Sweet spot for most marketplace models.</p>
+    </div>
+    <div class="model-tier-card">
+      <div class="model-tier-name">Medium</div>
+      <div class="model-tier-range">3B – 13B</div>
+      <p>A16+ / high-end Android. Richer agents, code assist, nuanced generation. Thermal throttling is a real concern on sustained use.</p>
+    </div>
+    <div class="model-tier-card">
+      <div class="model-tier-name">Large</div>
+      <div class="model-tier-range">13B – 70B</div>
+      <p>M-series Mac / future devices. Complex reasoning, long-context tasks. Impractical for most iOS apps today — but tomorrow's horizon.</p>
+    </div>
+    <div class="model-tier-card">
+      <div class="model-tier-name">XL</div>
+      <div class="model-tier-range">70B+</div>
+      <p>Not on-device yet. Cloud only for now. Useful ceiling for understanding distillation targets and where the industry is heading.</p>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
 <footer>
-  <span>© 2025 Small Model Marketplace</span>
-  <span style="color: var(--accent);">On-Device AI Infrastructure</span>
-  <span>Run any model. On any device. Right now.</span>
+  <div class="footer-grid">
+    <div>
+      <div class="footer-brand-name">Small Model Marketplace</div>
+      <p class="footer-brand-tagline">On-device AI infrastructure. Run any model, on any device, right now. We make models shippable — so you can focus on what they do.</p>
+    </div>
+    <div class="footer-col">
+      <div class="footer-col-title">Product</div>
+      <ul>
+        <li><a href="#">SDK Docs</a></li>
+        <li><a href="#">Device Testing</a></li>
+        <li><a href="#">Marketplace</a></li>
+        <li><a href="#">Changelog</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <div class="footer-col-title">Resources</div>
+      <ul>
+        <li><a href="#">iOS Quickstart</a></li>
+        <li><a href="#">Android Quickstart</a></li>
+        <li><a href="#">llms.txt</a></li>
+        <li><a href="#">Model Submission</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <div class="footer-col-title">Company</div>
+      <ul>
+        <li><a href="#">About</a></li>
+        <li><a href="#">Blog</a></li>
+        <li><a href="#">GitHub</a></li>
+        <li><a href="#">Contact</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>© 2025 Small Model Marketplace. Infrastructure, not models.</p>
+    <p class="footer-manifesto">Steam, not CUDA.</p>
+  </div>
 </footer>
 
 <script>
-  // Scroll reveal
-  const reveals = document.querySelectorAll('.reveal');
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach((entry, i) => {
-      if (entry.isIntersecting) {
-        // stagger siblings
-        const siblings = [...entry.target.parentElement.querySelectorAll('.reveal:not(.visible)')];
-        const idx = siblings.indexOf(entry.target);
-        entry.target.style.transitionDelay = `${Math.min(idx * 0.08, 0.3)}s`;
-        entry.target.classList.add('visible');
-        observer.unobserve(entry.target);
-      }
+  // CURSOR
+  const cursor = document.getElementById('cursor');
+  const ring = document.getElementById('cursor-ring');
+  let mx = 0, my = 0, rx = 0, ry = 0;
+
+  document.addEventListener('mousemove', (e) => {
+    mx = e.clientX; my = e.clientY;
+    cursor.style.left = mx + 'px';
+    cursor.style.top = my + 'px';
+  });
+
+  function animateRing() {
+    rx += (mx - rx) * 0.12;
+    ry += (my - ry) * 0.12;
+    ring.style.left = rx + 'px';
+    ring.style.top = ry + 'px';
+    requestAnimationFrame(animateRing);
+  }
+  animateRing();
+
+  document.querySelectorAll('a, button, .problem-card, .audience-card, .price-card, .model-tier-card').forEach(el => {
+    el.addEventListener('mouseenter', () => {
+      cursor.style.transform = 'translate(-50%, -50%) scale(2.5)';
+      cursor.style.background = 'var(--amber)';
+      ring.style.opacity = '0.3';
     });
-  }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
-
-  reveals.forEach(el => observer.observe(el));
-
-  // Animate chip bars on scroll
-  const chipBars = document.querySelectorAll('.chip-bar');
-  const barWidths = [...chipBars].map(b => b.style.width);
-  chipBars.forEach(b => b.style.width = '0');
-
-  const chipViz = document.querySelector('.chip-viz');
-  const chipObserver = new IntersectionObserver((entries) => {
-    if (entries[0].isIntersecting) {
-      chipBars.forEach((b, i) => {
-        setTimeout(() => { b.style.width = barWidths[i]; }, i * 200);
-      });
-      chipObserver.disconnect();
-    }
-  }, { threshold: 0.5 });
-
-  if (chipViz) chipObserver.observe(chipViz);
-
-  // Smooth active nav
-  const sections = document.querySelectorAll('section[id]');
-  const navLinks = document.querySelectorAll('.nav-links a');
-
-  window.addEventListener('scroll', () => {
-    let current = '';
-    sections.forEach(s => {
-      if (window.scrollY >= s.offsetTop - 120) current = s.id;
-    });
-    navLinks.forEach(a => {
-      a.style.color = a.getAttribute('href') === `#${current}` ? 'var(--accent)' : '';
+    el.addEventListener('mouseleave', () => {
+      cursor.style.transform = 'translate(-50%, -50%) scale(1)';
+      cursor.style.background = 'var(--leaf)';
+      ring.style.opacity = '0.6';
     });
   });
+
+  // SCROLL FADE-UP
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('visible');
+      }
+    });
+  }, { threshold: 0.15 });
+
+  document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
 </script>
 </body>
 </html>
